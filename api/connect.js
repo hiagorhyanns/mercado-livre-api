@@ -1,29 +1,34 @@
 export default async function handler(req, res) {
-  const { client_id, client_secret, redirect_uri, code } = req.query;
+  const { code } = req.query;
 
-  // LOGIN
+  const CLIENT_ID = process.env.CLIENT_ID;
+  const CLIENT_SECRET = process.env.CLIENT_SECRET;
+  const REDIRECT_URI = process.env.REDIRECT_URI;
+
   if (!code) {
-    const url = `https://auth.mercadolivre.com.br/authorization?response_type=code&client_id=${client_id}&redirect_uri=${redirect_uri}`;
-    res.writeHead(302, { Location: url });
-    res.end();
-    return;
+    return res.status(400).json({ error: "No code provided" });
   }
 
-  // TOKEN
-  const response = await fetch('https://api.mercadolibre.com/oauth/token', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({
-      grant_type: 'authorization_code',
-      client_id,
-      client_secret,
-      code,
-      redirect_uri
-    })
-  });
+  try {
+    const response = await fetch("https://api.mercadolibre.com/oauth/token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        grant_type: "authorization_code",
+        client_id: CLIENT_ID,
+        client_secret: CLIENT_SECRET,
+        code: code,
+        redirect_uri: REDIRECT_URI
+      })
+    });
 
-  const data = await response.json();
+    const data = await response.json();
 
-  res.setHeader('Content-Type', 'application/json');
-  res.end(JSON.stringify(data));
+    return res.status(200).json(data);
+
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
 }
