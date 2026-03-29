@@ -10,11 +10,6 @@ body {
   font-family: Arial;
   background:#ededed;
 }
-.header {
-  background:#ffe600;
-  padding:16px 30px;
-  font-weight:bold;
-}
 .container {
   display:flex;
   justify-content:center;
@@ -25,8 +20,6 @@ body {
   width:420px;
   padding:30px;
   border-radius:10px;
-  box-shadow:0 4px 20px rgba(0,0,0,0.1);
-  text-align:center;
 }
 .token {
   width:100%;
@@ -52,13 +45,31 @@ body {
   80% {opacity:1;}
   100% {opacity:0; display:none;}
 }
+p.conectado {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  color: #00bf15;
+  font-size: 18px;
+  margin-bottom: 40px;
+}
+p.conectado img {
+  padding-left: 5px;
+}
+input#tg {
+  width: 100%;
+  border: 0;
+  font-size: 14px;
+}
+span#user {
+  font-size: 14px;
+  display: block;
+  padding: 10px 0;
+}
 </style>
 </head>
 
 <body>
-
-<div class="header">Mercado Livre</div>
-
 <div class="alert">
 <img width="30px" src="https://marketplace.canva.com/44VpY/MAFJGS44VpY/1/tl/canva-green-ok-tick-approval-MAFJGS44VpY.png"/> Sua API foi conectada (6h)
 </div>
@@ -66,16 +77,14 @@ body {
 <div class="container">
   <div class="card">
 
-    <div class="success-icon"><img width="30px" src="https://marketplace.canva.com/44VpY/MAFJGS44VpY/1/tl/canva-green-ok-tick-approval-MAFJGS44VpY.png"/></div>
+    <p class="conectado">Conectado<img width="20px" src="https://marketplace.canva.com/44VpY/MAFJGS44VpY/1/tl/canva-green-ok-tick-approval-MAFJGS44VpY.png"></p>
 
-    <h2>Conectado</h2>
+    <p><b>Usuário</b> <span id="user"></span></p>
 
-    <p><b>User:</b> <span id="user"></span></p>
-
-    <p><b>Código TG:</b></p>
+    <p><b>Código TG</b></p>
     <input id="tg" readonly>
 
-    <p><b>Token:</b></p>
+    <p><b>Token</b></p>
     <textarea class="token" id="token"></textarea>
 
   </div>
