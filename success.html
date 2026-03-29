@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Conectado</title>
+
+<style>
+body {
+  margin:0;
+  font-family: Arial;
+  background:#ededed;
+}
+
+.header {
+  background:#ffe600;
+  padding:16px 30px;
+  font-weight:bold;
+}
+
+.container {
+  display:flex;
+  justify-content:center;
+  margin-top:80px;
+}
+
+.card {
+  background:white;
+  width:420px;
+  padding:30px;
+  border-radius:10px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.1);
+  text-align:center;
+}
+
+.success-icon {
+  font-size:50px;
+  color:#00a650;
+}
+
+.token {
+  width:100%;
+  height:80px;
+}
+
+.alert {
+  position:fixed;
+  top:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#00a650;
+  color:white;
+  padding:15px 25px;
+  border-radius:6px;
+  font-weight:bold;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  animation:fadeOut 4s forwards;
+}
+
+@keyframes fadeOut {
+  0% {opacity:1;}
+  80% {opacity:1;}
+  100% {opacity:0; display:none;}
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">Mercado Livre</div>
+
+<div class="alert">
+✔ Sua API foi conectada (6h)
+</div>
+
+<div class="container">
+  <div class="card">
+
+    <div class="success-icon">✔</div>
+
+    <h2>Conectado</h2>
+
+    <p><b>User:</b> <span id="user"></span></p>
+
+    <p><b>Código TG:</b></p>
+    <input id="tg" readonly>
+
+    <p><b>Token:</b></p>
+    <textarea class="token" id="token"></textarea>
+
+  </div>
+</div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+
+document.getElementById("user").innerText = params.get("user");
+document.getElementById("token").value = params.get("token");
+document.getElementById("tg").value = params.get("tg");
+</script>
+
+</body>
+</html>
