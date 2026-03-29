@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Conectar Mercado Livre</title>
+
+<style>
+body {
+  margin:0;
+  font-family: Arial, Helvetica;
+  background:#ededed;
+}
+
+.header {
+  background:#ffe600;
+  padding:16px 30px;
+  font-weight:bold;
+  font-size:20px;
+}
+
+.container {
+  display:flex;
+  justify-content:center;
+  margin-top:80px;
+}
+
+.card {
+  background:white;
+  width:420px;
+  padding:30px;
+  border-radius:10px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.1);
+}
+
+h2 {
+  margin-bottom:20px;
+}
+
+label {
+  font-size:14px;
+  color:#333;
+}
+
+input {
+  width:100%;
+  padding:12px;
+  margin:8px 0 15px;
+  border:1px solid #ccc;
+  border-radius:6px;
+}
+
+input:focus {
+  border-color:#3483fa;
+  outline:none;
+}
+
+button {
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:6px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.connect {
+  background:#3483fa;
+  color:white;
+}
+
+.connect:hover {
+  background:#2968c8;
+}
+
+.edit {
+  background:transparent;
+  color:#3483fa;
+  margin-bottom:10px;
+}
+
+.footer {
+  margin-top:15px;
+  font-size:12px;
+  color:#777;
+  text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">Mercado Livre</div>
+
+<div class="container">
+<div class="card">
+
+<h2>Conectar conta</h2>
+
+<label>Client ID</label>
+<input id="client_id">
+
+<label>Client Secret</label>
+<input id="client_secret">
+
+<label>Redirect URI</label>
+<input id="redirect_uri">
+
+<button class="edit" onclick="editar()">Editar campos</button>
+<button class="connect" onclick="conectar()">Conectar com Mercado Livre</button>
+
+<div class="footer">Integração via API</div>
+
+</div>
+</div>
+
+<script>
+
+// AUTO DEFAULT
+function defaultData(){
+  return {
+    client_id: "",
+    client_secret: "",
+    redirect_uri: window.location.origin + "/api/connect"
+  }
+}
+
+// CARREGAR SALVO
+function load(){
+  const data = JSON.parse(localStorage.getItem("ml_data")) || defaultData();
+
+  document.getElementById("client_id").value = data.client_id;
+  document.getElementById("client_secret").value = data.client_secret;
+  document.getElementById("redirect_uri").value = data.redirect_uri;
+
+  bloquear();
+}
+
+// SALVAR
+function save(){
+  const data = {
+    client_id: document.getElementById("client_id").value,
+    client_secret: document.getElementById("client_secret").value,
+    redirect_uri: document.getElementById("redirect_uri").value
+  };
+
+  localStorage.setItem("ml_data", JSON.stringify(data));
+}
+
+// BLOQUEAR INPUTS
+function bloquear(){
+  document.querySelectorAll("input").forEach(i => i.disabled = true);
+}
+
+// LIBERAR INPUTS
+function editar(){
+  document.querySelectorAll("input").forEach(i => i.disabled = false);
+}
+
+// CONECTAR
+function conectar(){
+  save();
+
+  const id = document.getElementById("client_id").value;
+  const secret = document.getElementById("client_secret").value;
+  const redirect = document.getElementById("redirect_uri").value;
+
+  const url = `/api/connect?client_id=${id}&client_secret=${secret}&redirect_uri=${redirect}`;
+
+  window.location.href = url;
+}
+
+// INIT
+window.onload = load;
+
+</script>
+
+</body>
+</html>
