@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Conectar Mercado Livre</title>
+
 <style>
 body {
   margin:0;
@@ -84,18 +85,6 @@ button {
   text-align:center;
 }
 </style>
-<script>
-const btn = document.getElementById("connectBtn");
-
-btn.addEventListener("click", () => {
-  const clientId = document.getElementById("client_id").value;
-  const redirectUri = document.getElementById("redirect_uri").value;
-
-  const url = `https://auth.mercadolivre.com.br/authorization?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}`;
-
-  window.location.href = url;
-});
-</script>
 </head>
 
 <body>
@@ -103,30 +92,30 @@ btn.addEventListener("click", () => {
 <div class="header">Mercado Livre</div>
 
 <div class="container">
-<div class="card">
+  <div class="card">
 
-<h2>Conectar conta</h2>
+    <h2>Conectar conta</h2>
 
-<label>Client ID</label>
-<input id="client_id">
+    <label>Client ID</label>
+    <input id="client_id">
 
-<label>Client Secret</label>
-<input id="client_secret">
+    <label>Client Secret</label>
+    <input id="client_secret">
 
-<label>Redirect URI</label>
-<input id="redirect_uri">
+    <label>Redirect URI</label>
+    <input id="redirect_uri">
 
-<button class="edit" onclick="editar()">Editar campos</button>
-<button class="connect" onclick="conectar()">Conectar com Mercado Livre</button>
+    <button class="edit" onclick="editar()">Editar campos</button>
+    <button class="connect" onclick="conectar()">Conectar com Mercado Livre</button>
 
-<div class="footer">Integração via API</div>
+    <div class="footer">Integração via API</div>
 
-</div>
+  </div>
 </div>
 
 <script>
 
-// AUTO DEFAULT
+// DEFAULT
 function defaultData(){
   return {
     client_id: "",
@@ -135,7 +124,7 @@ function defaultData(){
   }
 }
 
-// CARREGAR SALVO
+// LOAD
 function load(){
   const data = JSON.parse(localStorage.getItem("ml_data")) || defaultData();
 
@@ -146,7 +135,7 @@ function load(){
   bloquear();
 }
 
-// SALVAR
+// SAVE
 function save(){
   const data = {
     client_id: document.getElementById("client_id").value,
@@ -157,25 +146,24 @@ function save(){
   localStorage.setItem("ml_data", JSON.stringify(data));
 }
 
-// BLOQUEAR INPUTS
+// LOCK
 function bloquear(){
   document.querySelectorAll("input").forEach(i => i.disabled = true);
 }
 
-// LIBERAR INPUTS
+// UNLOCK
 function editar(){
   document.querySelectorAll("input").forEach(i => i.disabled = false);
 }
 
-// CONECTAR
+// CONNECT (CORRETO)
 function conectar(){
   save();
 
-  const id = document.getElementById("client_id").value;
-  const secret = document.getElementById("client_secret").value;
-  const redirect = document.getElementById("redirect_uri").value;
+  const clientId = document.getElementById("client_id").value;
+  const redirectUri = document.getElementById("redirect_uri").value;
 
-  const url = `/api/connect?client_id=${id}&client_secret=${secret}&redirect_uri=${redirect}`;
+  const url = `https://auth.mercadolivre.com.br/authorization?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}`;
 
   window.location.href = url;
 }
