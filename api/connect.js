@@ -1,34 +1,75 @@
-export default async function handler(req, res) {
-  const { code } = req.query;
+return res.status(200).send(`
+  <html>
+    <head>
+      <title>Conectado</title>
+      <style>
+        body {
+          font-family: Arial;
+          background: #ededed;
+          display:flex;
+          justify-content:center;
+          align-items:center;
+          height:100vh;
+        }
 
-  const CLIENT_ID = process.env.CLIENT_ID;
-  const CLIENT_SECRET = process.env.CLIENT_SECRET;
-  const REDIRECT_URI = process.env.REDIRECT_URI;
+        .card {
+          background:white;
+          padding:30px;
+          border-radius:10px;
+          box-shadow:0 4px 20px rgba(0,0,0,0.1);
+          width:400px;
+        }
 
-  if (!code) {
-    return res.status(400).json({ error: "No code provided" });
-  }
+        h2 {
+          margin-bottom:20px;
+        }
 
-  try {
-    const response = await fetch("https://api.mercadolibre.com/oauth/token", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        grant_type: "authorization_code",
-        client_id: CLIENT_ID,
-        client_secret: CLIENT_SECRET,
-        code: code,
-        redirect_uri: REDIRECT_URI
-      })
-    });
+        .item {
+          margin-bottom:10px;
+          font-size:14px;
+          word-break: break-all;
+        }
 
-    const data = await response.json();
+        .label {
+          font-weight:bold;
+        }
 
-    return res.status(200).json(data);
+        button {
+          margin-top:20px;
+          width:100%;
+          padding:12px;
+          border:none;
+          border-radius:6px;
+          background:#3483fa;
+          color:white;
+          font-weight:bold;
+          cursor:pointer;
+        }
+      </style>
+    </head>
 
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
-}
+    <body>
+      <div class="card">
+        <h2>Conta conectada</h2>
+
+        <div class="item">
+          <span class="label">User ID:</span> ${data.user_id}
+        </div>
+
+        <div class="item">
+          <span class="label">Access Token:</span><br>
+          ${data.access_token}
+        </div>
+
+        <div class="item">
+          <span class="label">Refresh Token:</span><br>
+          ${data.refresh_token}
+        </div>
+
+        <button onclick="navigator.clipboard.writeText('${data.access_token}')">
+          Copiar Access Token
+        </button>
+      </div>
+    </body>
+  </html>
+`);
