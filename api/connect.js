@@ -22,27 +22,21 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    // DEBUG (IMPORTANTE)
+    // DEBUG
     if (!data.access_token) {
       return res.status(200).send(`
-        <h2>Erro:</h2>
+        <h2>Erro ao conectar</h2>
         <pre>${JSON.stringify(data, null, 2)}</pre>
       `);
     }
 
-    // SUCESSO
-    return res.status(200).send(`
-      <html>
-        <body style="font-family:Arial; background:#ededed; display:flex; justify-content:center; align-items:center; height:100vh;">
-          <div style="background:white; padding:30px; border-radius:10px;">
-            <h2>Conectado</h2>
-            <p><b>User:</b> ${data.user_id}</p>
-            <p><b>Token:</b></p>
-            <textarea style="width:300px; height:100px;">${data.access_token}</textarea>
-          </div>
-        </body>
-      </html>
-    `);
+    // GERAR TG (usa o próprio code)
+    const tg = code;
+
+    // REDIRECT PARA TELA FINAL
+    const redirectUrl = `/success.html?user=${data.user_id}&token=${data.access_token}&tg=${tg}&expires=${data.expires_in}`;
+
+    return res.redirect(redirectUrl);
 
   } catch (err) {
     return res.status(500).send(err.toString());
