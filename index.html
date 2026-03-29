@@ -84,6 +84,18 @@ button {
   text-align:center;
 }
 </style>
+<script>
+const btn = document.getElementById("connectBtn");
+
+btn.addEventListener("click", () => {
+  const clientId = document.getElementById("client_id").value;
+  const redirectUri = document.getElementById("redirect_uri").value;
+
+  const url = `https://auth.mercadolivre.com.br/authorization?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}`;
+
+  window.location.href = url;
+});
+</script>
 </head>
 
 <body>
