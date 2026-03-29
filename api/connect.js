@@ -1,75 +1,40 @@
-return res.status(200).send(`
-  <html>
-    <head>
-      <title>Conectado</title>
-      <style>
-        body {
-          font-family: Arial;
-          background: #ededed;
-          display:flex;
-          justify-content:center;
-          align-items:center;
-          height:100vh;
-        }
+export default async function handler(req, res) {
+  const { code } = req.query;
 
-        .card {
-          background:white;
-          padding:30px;
-          border-radius:10px;
-          box-shadow:0 4px 20px rgba(0,0,0,0.1);
-          width:400px;
-        }
+  const CLIENT_ID = process.env.CLIENT_ID;
+  const CLIENT_SECRET = process.env.CLIENT_SECRET;
+  const REDIRECT_URI = process.env.REDIRECT_URI;
 
-        h2 {
-          margin-bottom:20px;
-        }
+  if (!code) {
+    return res.status(400).json({ error: "No code provided" });
+  }
 
-        .item {
-          margin-bottom:10px;
-          font-size:14px;
-          word-break: break-all;
-        }
+  try {
+    const response = await fetch("https://api.mercadolibre.com/oauth/token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        grant_type: "authorization_code",
+        client_id: CLIENT_ID,
+        client_secret: CLIENT_SECRET,
+        code: code,
+        redirect_uri: REDIRECT_URI
+      })
+    });
 
-        .label {
-          font-weight:bold;
-        }
+    const data = await response.json();
 
-        button {
-          margin-top:20px;
-          width:100%;
-          padding:12px;
-          border:none;
-          border-radius:6px;
-          background:#3483fa;
-          color:white;
-          font-weight:bold;
-          cursor:pointer;
-        }
-      </style>
-    </head>
+    if (!data.access_token) {
+      return res.status(400).json(data);
+    }
 
-    <body>
-      <div class="card">
-        <h2>Conta conectada</h2>
+    return res.redirect(
+      `/?access_token=${encodeURIComponent(data.access_token)}&refresh_token=${encodeURIComponent(data.refresh_token)}&user_id=${data.user_id}`
+    );
 
-        <div class="item">
-          <span class="label">User ID:</span> ${data.user_id}
-        </div>
-
-        <div class="item">
-          <span class="label">Access Token:</span><br>
-          ${data.access_token}
-        </div>
-
-        <div class="item">
-          <span class="label">Refresh Token:</span><br>
-          ${data.refresh_token}
-        </div>
-
-        <button onclick="navigator.clipboard.writeText('${data.access_token}')">
-          Copiar Access Token
-        </button>
-      </div>
-    </body>
-  </html>
-`);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+}
