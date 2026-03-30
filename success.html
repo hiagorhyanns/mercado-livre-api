@@ -2,40 +2,49 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
 <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/hiagorhyanns/mercado-livre-api/29a8c4b095c3e39ee5ecf28f0e4be283621d5f61/img/conectado-ml.png">
+
 <title>::. Conectado. ::. ON ::.</title>
+
 <style>
 body {
   margin:0;
   font-family: Inter, Helvetica;
   background:#ededed;
 }
+
 .container {
-  display: flex;
-  width: 100%;
-  height: 100vh;
-  justify-content: center;
-  align-items: center;
+  display:flex;
+  width:100%;
+  height:100vh;
+  justify-content:center;
+  align-items:center;
 }
+
 .card {
   background:white;
   width:420px;
   padding:30px;
   border-radius:10px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow:0 4px 20px rgba(0,0,0,0.1);
 }
+
 .card p,
 .card textarea,
 .card input {
-  color: #333;
+  color:#333;
 }
+
 .token {
-  font-size: 14px;
-  border: 0;
+  font-size:14px;
+  border:0;
   width:100%;
   height:80px;
 }
+
 .alert {
   position:fixed;
   top:20px;
@@ -51,44 +60,53 @@ body {
   gap:10px;
   animation:fadeOut 4s forwards;
 }
+
 @keyframes fadeOut {
   0% {opacity:1;}
   80% {opacity:1;}
   100% {opacity:0; display:none;}
 }
-p.conectado {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  color: #00bf15;
-  font-size: 1.5em;
-  margin-bottom: 40px;
-}
-p.conectado img {
-  padding-left: 5px;
-}
+
 input#tg {
-  width: 100%;
-  border: 0;
-  font-size: 14px;
+  width:100%;
+  border:0;
+  font-size:14px;
 }
+
 span#user {
-  font-size: 14px;
-  display: block;
-  padding: 10px 0;
+  font-size:14px;
+  display:block;
+  padding:10px 0;
+}
+
+/* BOTÃO PUBLICAR */
+.btn-publicar {
+  margin-top:20px;
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:6px;
+  background:#3483fa;
+  color:white;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.btn-publicar:hover {
+  background:#2968c8;
 }
 </style>
 </head>
 
 <body>
+
 <div class="alert">
-<img width="30px" src="https://marketplace.canva.com/44VpY/MAFJGS44VpY/1/tl/canva-green-ok-tick-approval-MAFJGS44VpY.png"/> Sua API foi conectada (6h)
+  <img width="30px" src="https://marketplace.canva.com/44VpY/MAFJGS44VpY/1/tl/canva-green-ok-tick-approval-MAFJGS44VpY.png"/>
+  Sua API foi conectada (6h)
 </div>
 
 <div class="container">
   <div class="card">
-
-    <!--<p class="conectado">Conectado<img width="20px" src="https://marketplace.canva.com/44VpY/MAFJGS44VpY/1/tl/canva-green-ok-tick-approval-MAFJGS44VpY.png"></p>-->
 
     <p><b>Usuário</b> <span id="user"></span></p>
 
@@ -98,15 +116,29 @@ span#user {
     <p><b>Token</b></p>
     <textarea class="token" id="token"></textarea>
 
+    <!-- BOTÃO -->
+    <button class="btn-publicar" onclick="irPublicar()">
+      Publicar anúncios
+    </button>
+
   </div>
 </div>
 
 <script>
 const params = new URLSearchParams(window.location.search);
 
-document.getElementById("user").innerText = params.get("user");
-document.getElementById("token").value = params.get("token");
-document.getElementById("tg").value = params.get("tg");
+const user = params.get("user");
+const token = params.get("token");
+const tg = params.get("tg");
+
+document.getElementById("user").innerText = user;
+document.getElementById("token").value = token;
+document.getElementById("tg").value = tg;
+
+// REDIRECIONAR PARA TELA DE PUBLICAÇÃO
+function irPublicar(){
+  window.location.href = `/publicar.html?token=${token}`;
+}
 </script>
 
 </body>
