@@ -16,12 +16,21 @@ export default async function handler(req, res) {
 
     for (const p of produtos) {
 
-      // VALIDAÇÃO BÁSICA
-      if (!p.title || !p.category_id || !p.price || !p.pictures?.length) {
+      // ✔ VALIDAÇÃO PRINCIPAL
+      if (
+        !p.title ||
+        !p.category_id ||
+        !p.price ||
+        !p.pictures?.length ||
+        !p.marca ||
+        !p.modelo ||
+        !p.cor ||
+        !p.sexo
+      ) {
         results.push({
           erro: true,
           produto: p.title || "Sem título",
-          detalhe: "Dados incompletos"
+          detalhe: "Preencha todos os atributos obrigatórios (marca, modelo, cor, sexo)"
         });
         continue;
       }
@@ -46,19 +55,15 @@ export default async function handler(req, res) {
             condition: "new",
 
             pictures: p.pictures
-              .filter(url => url)
+              .filter(url => url && url.startsWith("http"))
               .map(url => ({ source: url })),
 
             attributes: [
-              { id: "BRAND", value_name: p.marca || "Genérica" },
-              { id: "MODEL", value_name: p.modelo || "Padrão" },
-              { id: "GENDER", value_name: p.sexo || "Feminino" },
-              { id: "SIZE", value_name: "M" },
-              { id: "COLOR", value_name: p.cor || "Preto" },
-
-              // ✔ OBRIGATÓRIOS
-              { id: "FAMILY_NAME", value_name: p.produto || "Vestido" },
-              { id: "ITEM_CONDITION", value_name: "Novo" }
+              { id: "BRAND", value_name: p.marca },
+              { id: "MODEL", value_name: p.modelo },
+              { id: "COLOR", value_name: p.cor },
+              { id: "GENDER", value_name: p.sexo },
+              { id: "SIZE", value_name: p.tamanho || "M" }
             ]
 
           })
