@@ -46,11 +46,12 @@ export default async function handler(req, res) {
             pictures: p.pictures.map(url => ({ source: url })),
 
             attributes: [
-              { id: "BRAND", value_name: "Genérica" },
-              { id: "MODEL", value_name: "Padrão" },
-              { id: "GENDER", value_name: "Feminino" },
+              { id: "BRAND", value_name: p.marca || "Genérica" },
+              { id: "MODEL", value_name: p.modelo || "Padrão" },
+              { id: "GENDER", value_name: p.sexo || "Feminino" },
               { id: "SIZE", value_name: "M" },
-              { id: "COLOR", value_name: "Preto" }
+              { id: "COLOR", value_name: p.cor || "Preto" },
+              { id: "FAMILY_NAME", value_name: p.produto || "Vestido" }
             ]
           })
         });
