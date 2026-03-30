@@ -5,6 +5,7 @@
 
 <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/hiagorhyanns/mercado-livre-api/29a8c4b095c3e39ee5ecf28f0e4be283621d5f61/img/conectado-ml.png">
 <title>::. Publicar. ::. Anúncios ::.</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
@@ -13,7 +14,6 @@
   box-sizing: border-box;
 }
 body {
-  font-family: Inter;
   background:#ededed;
 }
 .container {
@@ -24,7 +24,7 @@ body {
   display:flex;
   gap:10px;
 }
-input, textarea {
+input, textarea, select {
   padding:10px;
   border:1px solid #ccc;
   border-radius:5px;
@@ -72,6 +72,31 @@ button {
 
 const token = new URLSearchParams(window.location.search).get("token");
 
+function formatarPreco(input){
+  let v = input.value.replace(/\D/g, "");
+  v = (v / 100).toFixed(2) + "";
+  v = v.replace(".", ",");
+  v = v.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  input.value = "R$ " + v;
+}
+
+function gerarTitulo(card){
+  const inputs = card.querySelectorAll("input");
+
+  const produto = inputs[4].value;
+  const modelo = inputs[5].value;
+  const detalhes = inputs[6].value;
+  const marca = inputs[7].value;
+  const cor = inputs[8].value;
+  const sexo = inputs[9].value;
+
+  let titulo = `${produto} ${modelo} ${detalhes} ${marca} ${cor} ${sexo}`;
+
+  titulo = titulo.trim().substring(0, 60);
+
+  inputs[10].value = titulo;
+}
+
 function addForm(){
   const div = document.createElement("div");
   div.className = "card";
@@ -85,21 +110,24 @@ function addForm(){
     </div>
     
     <div class="row">
-      <input placeholder="Produto">
-      <input placeholder="Modelo">
-      <input placeholder="Detalhes">
-      <input placeholder="Marca">
-      <input placeholder="Cor">
-      <input placeholder="Sexo">
+      <input placeholder="Produto" oninput="gerarTitulo(this.closest('.card'))">
+      <input placeholder="Modelo" oninput="gerarTitulo(this.closest('.card'))">
+      <input placeholder="Detalhes" oninput="gerarTitulo(this.closest('.card'))">
+      <input placeholder="Marca" oninput="gerarTitulo(this.closest('.card'))">
+      <input placeholder="Cor" oninput="gerarTitulo(this.closest('.card'))">
+      <input placeholder="Sexo" oninput="gerarTitulo(this.closest('.card'))">
     </div>
 
-    <input placeholder="Nome completo do produto">
+    <input placeholder="Nome completo do produto (máx 60)" maxlength="60">
 
     <textarea placeholder="Descrição"></textarea>
 
-    <input value="MLB1430">
+    <select>
+      <option value="MLB1430">Vestidos</option>
+      <option value="MLB1744">Peças Impressora 3D</option>
+    </select>
 
-    <input placeholder="Preço">
+    <input placeholder="Preço" oninput="formatarPreco(this)">
   `;
 
   document.getElementById("formArea").appendChild(div);
@@ -112,23 +140,35 @@ async function publicar(){
   const cards = document.querySelectorAll(".card");
   const produtos = [];
 
-  cards.forEach(card => {
-    const inputs = card.querySelectorAll("input, textarea");
+  for (const card of cards) {
+
+    const inputs = card.querySelectorAll("input, textarea, select");
+
+    const title = inputs[10].value.trim();
+    const descricao = inputs[11].value.trim();
+    const categoria = inputs[12].value;
+    const preco = inputs[13].value.replace(/\D/g, "") / 100;
+
+    const imagens = [
+      inputs[0].value,
+      inputs[1].value,
+      inputs[2].value,
+      inputs[3].value
+    ].filter(i => i);
+
+    if (!title || !preco || imagens.length === 0) {
+      alert("Preencha título, preço e ao menos 1 imagem");
+      return;
+    }
 
     produtos.push({
-      title: inputs[6].value,
-      description: inputs[7].value,
-      category_id: inputs[8].value,
-      price: Number(inputs[9].value),
-
-      pictures: [
-        inputs[10].value,
-        inputs[11].value,
-        inputs[12].value,
-        inputs[13].value
-      ]
+      title,
+      description: descricao,
+      category_id: categoria,
+      price: preco,
+      pictures: imagens
     });
-  });
+  }
 
   const res = await fetch("/api/create-items", {
     method: "POST",
@@ -140,8 +180,13 @@ async function publicar(){
 
   const data = await res.json();
 
-  alert("Anúncios publicados!");
   console.log(data);
+
+  if (data.some(r => r.error)) {
+    alert("Erro em alguns anúncios");
+  } else {
+    alert("Anúncios publicados com sucesso!");
+  }
 }
 </script>
 
