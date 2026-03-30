@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Publicar Anúncios</title>
+
+<style>
+body {
+  font-family: Arial;
+  background:#ededed;
+}
+
+.container {
+  width:900px;
+  margin:40px auto;
+}
+
+.row {
+  display:flex;
+  gap:10px;
+  margin-bottom:10px;
+}
+
+input, textarea {
+  padding:10px;
+  border:1px solid #ccc;
+  border-radius:5px;
+  width:100%;
+}
+
+textarea {
+  height:80px;
+}
+
+button {
+  padding:12px;
+  border:none;
+  border-radius:5px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.add {
+  background:#3483fa;
+  color:white;
+}
+
+.publish {
+  background:#00a650;
+  color:white;
+}
+
+.card {
+  background:white;
+  padding:20px;
+  margin-bottom:15px;
+  border-radius:8px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div id="formArea"></div>
+
+<button class="add" onclick="addForm()">Criar mais +1 anúncio</button>
+<button class="publish" onclick="publicar()">Publicar anúncios em massa</button>
+
+</div>
+
+<script>
+
+const token = new URLSearchParams(window.location.search).get("token");
+
+function addForm(){
+  const div = document.createElement("div");
+  div.className = "card";
+
+  div.innerHTML = `
+    <div class="row">
+      <input placeholder="Produto">
+      <input placeholder="Modelo">
+      <input placeholder="Detalhes">
+      <input placeholder="Marca">
+      <input placeholder="Cor">
+      <input placeholder="Sexo">
+    </div>
+
+    <input placeholder="Nome completo do produto">
+
+    <textarea placeholder="Descrição"></textarea>
+
+    <input value="MLB1430">
+
+    <input placeholder="Preço">
+
+    <div class="row">
+      <input placeholder="Imagem 1 URL">
+      <input placeholder="Imagem 2 URL">
+      <input placeholder="Imagem 3 URL">
+      <input placeholder="Imagem 4 URL">
+    </div>
+  `;
+
+  document.getElementById("formArea").appendChild(div);
+}
+
+addForm();
+
+async function publicar(){
+
+  const cards = document.querySelectorAll(".card");
+  const produtos = [];
+
+  cards.forEach(card => {
+    const inputs = card.querySelectorAll("input, textarea");
+
+    produtos.push({
+      title: inputs[6].value,
+      description: inputs[7].value,
+      category_id: inputs[8].value,
+      price: Number(inputs[9].value),
+
+      pictures: [
+        inputs[10].value,
+        inputs[11].value,
+        inputs[12].value,
+        inputs[13].value
+      ]
+    });
+  });
+
+  const res = await fetch("/api/create-items", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ produtos, token })
+  });
+
+  const data = await res.json();
+
+  alert("Anúncios publicados!");
+  console.log(data);
+}
+</script>
+
+</body>
+</html>
