@@ -134,32 +134,32 @@ function addForm(){
   div.className = "card";
 
   div.innerHTML = `
-    <select>
+    <select name="categoria">
       <option value="MLB1430">Vestidos</option>
-      <option value="MLB1744">Peças Impressora 3D</option>
+      <option value="MLB1744">Peças 3D</option>
     </select>
     
     <div class="row">
-      <input placeholder="Imagem 1 URL">
-      <input placeholder="Imagem 2 URL">
-      <input placeholder="Imagem 3 URL">
-      <input placeholder="Imagem 4 URL">
+      <input name="img1" placeholder="Imagem 1 URL">
+      <input name="img2" placeholder="Imagem 2 URL">
+      <input name="img3" placeholder="Imagem 3 URL">
+      <input name="img4" placeholder="Imagem 4 URL">
     </div>
     
     <div class="row">
-      <input placeholder="Produto" oninput="gerarTitulo(this.closest('.card'))">
-      <input placeholder="Modelo" oninput="gerarTitulo(this.closest('.card'))">
-      <input placeholder="Detalhes" oninput="gerarTitulo(this.closest('.card'))">
-      <input placeholder="Marca" oninput="gerarTitulo(this.closest('.card'))">
-      <input placeholder="Cor" oninput="gerarTitulo(this.closest('.card'))">
-      <input placeholder="Sexo" oninput="gerarTitulo(this.closest('.card'))">
+      <input name="produto" placeholder="Produto">
+      <input name="modelo" placeholder="Modelo">
+      <input name="detalhes" placeholder="Detalhes">
+      <input name="marca" placeholder="Marca">
+      <input name="cor" placeholder="Cor">
+      <input name="sexo" placeholder="Sexo">
     </div>
 
-    <input placeholder="Nome completo do produto (máx 60)" maxlength="60">
+    <input name="titulo" placeholder="Nome completo do produto" maxlength="60">
 
-    <textarea placeholder="Descrição"></textarea>
+    <textarea name="descricao"></textarea>
 
-    <input placeholder="Preço" oninput="formatarPreco(this)">
+    <input name="preco" placeholder="Preço">
   `;
 
   document.getElementById("formArea").appendChild(div);
