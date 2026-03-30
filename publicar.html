@@ -198,7 +198,15 @@ async function publicar(){
       description: descricao,
       category_id: categoria,
       price: preco,
-      pictures: imagens
+      pictures: imagens,
+    
+      // 👇 NOVO (enviado pro backend)
+      produto: inputs[4].value,
+      modelo: inputs[5].value,
+      detalhes: inputs[6].value,
+      marca: inputs[7].value,
+      cor: inputs[8].value,
+      sexo: inputs[9].value
     });
   }
 
