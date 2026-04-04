@@ -16,14 +16,13 @@ export default async function handler(req, res) {
 
     for (const p of produtos) {
 
-      // ✔ VALIDAÇÃO COMPLETA
+      // VALIDAÇÃO
       if (
         !p.title ||
         !p.category_id ||
         !p.price ||
         !p.pictures?.length ||
         !p.marca ||
-        !p.modelo ||
         !p.cor ||
         !p.sexo ||
         !p.tamanho
@@ -38,41 +37,44 @@ export default async function handler(req, res) {
 
       try {
 
+        const pictures = p.pictures
+          .filter(url => url && url.startsWith("http"))
+          .map(url => ({ source: url }));
+
+        // ✅ ESTRUTURA CORRETA: attribute_combinations DENTRO de variations
+        // Não no nível raiz do item — esse era o bug principal.
         const body = {
 
           title: p.title,
           category_id: p.category_id,
-          price: Number(p.price),
           currency_id: "BRL",
-          available_quantity: 10,
           buying_mode: "buy_it_now",
           listing_type_id: "gold_special",
           condition: "new",
+          pictures,
 
-          pictures: p.pictures
-            .filter(url => url && url.startsWith("http"))
-            .map(url => ({ source: url })),
-
-          // 🔥 ESSENCIAL (resolve erro)
-          attribute_combinations: [
+          // ✅ VARIATIONS: preço e quantidade ficam aqui, não no nível raiz
+          variations: [
             {
-              attributes: [
+              attribute_combinations: [
                 { id: "COLOR", value_name: p.cor },
-                { id: "SIZE", value_name: p.tamanho }
-              ]
+                { id: "SIZE",  value_name: p.tamanho }
+              ],
+              price: Number(p.price),
+              available_quantity: 10
             }
           ],
 
+          // Atributos fixos (não variam por SKU)
           attributes: [
-            { id: "BRAND", value_name: p.marca },
-            { id: "MODEL", value_name: p.modelo },
-            { id: "COLOR", value_name: p.cor },
-            { id: "GENDER", value_name: p.sexo },
-            { id: "SIZE", value_name: p.tamanho }
+            { id: "BRAND",  value_name: p.marca  },
+            { id: "GENDER", value_name: p.sexo   },
+            ...(p.modelo ? [{ id: "MODEL", value_name: p.modelo }] : [])
           ]
 
         };
 
+        // 1️⃣ CRIAR O ITEM
         const response = await fetch("https://api.mercadolibre.com/items", {
           method: "POST",
           headers: {
@@ -84,25 +86,42 @@ export default async function handler(req, res) {
 
         const data = await response.json();
 
-        // DEBUG IMPORTANTE
         if (!response.ok || data.error) {
-
           results.push({
             erro: true,
             produto: p.title,
             status: response.status,
             detalhe: data
           });
-
-        } else {
-
-          results.push({
-            sucesso: true,
-            produto: p.title,
-            id: data.id
-          });
-
+          continue;
         }
+
+        // 2️⃣ POSTAR DESCRIÇÃO SEPARADA (endpoint próprio da ML)
+        if (p.description && p.description.trim()) {
+          const descRes = await fetch(
+            `https://api.mercadolibre.com/items/${data.id}/description`,
+            {
+              method: "POST",
+              headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({ plain_text: p.description })
+            }
+          );
+
+          if (!descRes.ok) {
+            const descErr = await descRes.json();
+            console.warn(`Descrição não salva para ${data.id}:`, descErr);
+          }
+        }
+
+        results.push({
+          sucesso: true,
+          produto: p.title,
+          id: data.id,
+          link: data.permalink
+        });
 
       } catch (err) {
 
