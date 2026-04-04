@@ -3,27 +3,19 @@
 <head>
 <meta charset="UTF-8">
 
-<link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/hiagorhyanns/mercado-livre-api/29a8c4b095c3e39ee5ecf28f0e4be283621d5f61/img/conectado-ml.png">
-<title>::. Publicar. ::. Anúncios ::.</title>
+<link rel="icon" href="https://raw.githubusercontent.com/hiagorhyanns/mercado-livre-api/29a8c4b095c3e39ee5ecf28f0e4be283621d5f61/img/conectado-ml.png">
+<title>:: Publicar Anúncios ::</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
-* {
-  font-family: 'Inter' !important;
-  box-sizing: border-box;
-}
-body {
-  background:#ededed;
-}
-.container {
-  width:900px;
-  margin:40px auto;
-}
-.row {
-  display:flex;
-  gap:10px;
-}
+* { font-family: 'Inter'; box-sizing: border-box; }
+body { background:#ededed; }
+
+.container { width:900px; margin:40px auto; }
+
+.row { display:flex; gap:10px; }
+
 input, textarea, select {
   padding:10px;
   border:1px solid #ccc;
@@ -31,9 +23,9 @@ input, textarea, select {
   width:100%;
   margin-bottom:10px;
 }
-textarea {
-  height:80px;
-}
+
+textarea { height:80px; }
+
 button {
   padding:12px;
   border:none;
@@ -41,14 +33,10 @@ button {
   font-weight:bold;
   cursor:pointer;
 }
-.add {
-  background:#3483fa;
-  color:white;
-}
-.publish {
-  background:#00a650;
-  color:white;
-}
+
+.add { background:#3483fa; color:white; }
+.publish { background:#00a650; color:white; }
+
 .card {
   background:white;
   padding:20px;
@@ -56,7 +44,7 @@ button {
   border-radius:8px;
 }
 
-/* ALERTA BONITO */
+/* ALERT */
 .alert {
   position:fixed;
   top:20px;
@@ -95,40 +83,35 @@ button {
 
 const token = new URLSearchParams(window.location.search).get("token");
 
-// ALERTA VISUAL
+// ALERTA
 function showAlert(msg, type="success"){
   const div = document.createElement("div");
   div.className = `alert ${type}`;
   div.innerText = msg;
   document.body.appendChild(div);
-
   setTimeout(() => div.remove(), 4000);
 }
 
+// PREÇO
 function formatarPreco(input){
   let v = input.value.replace(/\D/g, "");
-  v = (v / 100).toFixed(2) + "";
+  v = (v / 100).toFixed(2);
   v = v.replace(".", ",");
   v = v.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   input.value = "R$ " + v;
 }
 
+// TÍTULO AUTO
 function gerarTitulo(card){
-  const inputs = card.querySelectorAll("input");
+  const get = name => card.querySelector(`[name="${name}"]`).value;
 
-  const produto = inputs[4].value;
-  const modelo = inputs[5].value;
-  const detalhes = inputs[6].value;
-  const marca = inputs[7].value;
-  const cor = inputs[8].value;
-  const sexo = inputs[9].value;
-
-  let titulo = `${produto} ${modelo} ${detalhes} ${marca} ${cor} ${sexo}`;
+  let titulo = `${get("produto")} ${get("modelo")} ${get("marca")} ${get("cor")} ${get("sexo")}`;
   titulo = titulo.trim().substring(0, 60);
 
-  inputs[10].value = titulo;
+  card.querySelector('[name="titulo"]').value = titulo;
 }
 
+// FORM
 function addForm(){
   const div = document.createElement("div");
   div.className = "card";
@@ -136,30 +119,49 @@ function addForm(){
   div.innerHTML = `
     <select name="categoria">
       <option value="MLB1430">Vestidos</option>
-      <option value="MLB1744">Peças 3D</option>
     </select>
-    
+
     <div class="row">
-      <input name="img1" placeholder="Imagem 1 URL">
+      <input name="img1" placeholder="Imagem 1 URL" required>
       <input name="img2" placeholder="Imagem 2 URL">
       <input name="img3" placeholder="Imagem 3 URL">
       <input name="img4" placeholder="Imagem 4 URL">
     </div>
-    
+
     <div class="row">
-      <input name="produto" placeholder="Produto">
-      <input name="modelo" placeholder="Modelo">
-      <input name="detalhes" placeholder="Detalhes">
-      <input name="marca" placeholder="Marca">
-      <input name="cor" placeholder="Cor">
-      <input name="sexo" placeholder="Sexo">
+      <input name="produto" placeholder="Produto" required oninput="gerarTitulo(this.closest('.card'))">
+      <input name="modelo" placeholder="Modelo" required oninput="gerarTitulo(this.closest('.card'))">
+      <input name="marca" placeholder="Marca" required oninput="gerarTitulo(this.closest('.card'))">
+
+      <select name="cor" required onchange="gerarTitulo(this.closest('.card'))">
+        <option value="">Cor</option>
+        <option>Preto</option>
+        <option>Branco</option>
+        <option>Vermelho</option>
+        <option>Azul</option>
+        <option>Verde</option>
+      </select>
+
+      <select name="sexo" required onchange="gerarTitulo(this.closest('.card'))">
+        <option value="">Sexo</option>
+        <option>Feminino</option>
+        <option>Masculino</option>
+      </select>
+
+      <select name="tamanho" required>
+        <option value="">Tamanho</option>
+        <option>P</option>
+        <option>M</option>
+        <option>G</option>
+        <option>GG</option>
+      </select>
     </div>
 
-    <input name="titulo" placeholder="Nome completo do produto" maxlength="60">
+    <input name="titulo" placeholder="Nome completo do produto" maxlength="60" required>
 
     <textarea name="descricao"></textarea>
 
-    <input name="preco" placeholder="Preço">
+    <input name="preco" placeholder="Preço" oninput="formatarPreco(this)" required>
   `;
 
   document.getElementById("formArea").appendChild(div);
@@ -167,54 +169,51 @@ function addForm(){
 
 addForm();
 
+// PUBLICAR
 async function publicar(){
 
   const cards = document.querySelectorAll(".card");
   const produtos = [];
 
+  const get = (card, name) => card.querySelector(`[name="${name}"]`).value;
+
   for (const card of cards) {
 
-    const inputs = card.querySelectorAll("input, textarea, select");
-
-    const title = inputs[10].value.trim();
-    const descricao = inputs[11].value.trim();
-    const categoria = inputs[12].value;
-    const preco = inputs[13].value.replace(/\D/g, "") / 100;
+    const title = get(card, "titulo").trim();
+    const preco = get(card, "preco").replace(/\D/g, "") / 100;
+    const categoria = get(card, "categoria");
 
     const imagens = [
-      inputs[0].value,
-      inputs[1].value,
-      inputs[2].value,
-      inputs[3].value
-    ].filter(i => i);
+      get(card, "img1"),
+      get(card, "img2"),
+      get(card, "img3"),
+      get(card, "img4")
+    ].filter(Boolean);
 
     if (!title || !preco || imagens.length === 0) {
-      showAlert("Preencha título, preço e ao menos 1 imagem", "error");
+      showAlert("Preencha todos os campos obrigatórios", "error");
       return;
     }
 
     produtos.push({
       title,
-      description: descricao,
+      description: get(card, "descricao"),
       category_id: categoria,
       price: preco,
       pictures: imagens,
-    
-      // 👇 NOVO (enviado pro backend)
-      produto: inputs[4].value,
-      modelo: inputs[5].value,
-      detalhes: inputs[6].value,
-      marca: inputs[7].value,
-      cor: inputs[8].value,
-      sexo: inputs[9].value
+
+      produto: get(card, "produto"),
+      modelo: get(card, "modelo"),
+      marca: get(card, "marca"),
+      cor: get(card, "cor"),
+      sexo: get(card, "sexo"),
+      tamanho: get(card, "tamanho")
     });
   }
 
   const res = await fetch("/api/create-items", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ produtos, token })
   });
 
@@ -226,11 +225,12 @@ async function publicar(){
 
   if (erro) {
     console.log("Erro real:", erro.detalhe);
-    showAlert("Erro ao publicar (ver console F12)", "error");
+    showAlert("Erro ao publicar (F12)", "error");
   } else {
     showAlert("Anúncios publicados com sucesso!", "success");
   }
 }
+
 </script>
 
 </body>
