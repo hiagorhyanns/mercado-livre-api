@@ -16,7 +16,7 @@ export default async function handler(req, res) {
 
     for (const p of produtos) {
 
-      // ✔ VALIDAÇÃO PRINCIPAL
+      // ✔ VALIDAÇÃO COMPLETA
       if (
         !p.title ||
         !p.category_id ||
@@ -25,17 +25,53 @@ export default async function handler(req, res) {
         !p.marca ||
         !p.modelo ||
         !p.cor ||
-        !p.sexo
+        !p.sexo ||
+        !p.tamanho
       ) {
         results.push({
           erro: true,
           produto: p.title || "Sem título",
-          detalhe: "Preencha todos os atributos obrigatórios (marca, modelo, cor, sexo)"
+          detalhe: "Preencha todos os campos obrigatórios"
         });
         continue;
       }
 
       try {
+
+        const body = {
+
+          title: p.title,
+          category_id: p.category_id,
+          price: Number(p.price),
+          currency_id: "BRL",
+          available_quantity: 10,
+          buying_mode: "buy_it_now",
+          listing_type_id: "gold_special",
+          condition: "new",
+
+          pictures: p.pictures
+            .filter(url => url && url.startsWith("http"))
+            .map(url => ({ source: url })),
+
+          // 🔥 ESSENCIAL (resolve erro)
+          attribute_combinations: [
+            {
+              attributes: [
+                { id: "COLOR", value_name: p.cor },
+                { id: "SIZE", value_name: p.tamanho }
+              ]
+            }
+          ],
+
+          attributes: [
+            { id: "BRAND", value_name: p.marca },
+            { id: "MODEL", value_name: p.modelo },
+            { id: "COLOR", value_name: p.cor },
+            { id: "GENDER", value_name: p.sexo },
+            { id: "SIZE", value_name: p.tamanho }
+          ]
+
+        };
 
         const response = await fetch("https://api.mercadolibre.com/items", {
           method: "POST",
@@ -43,34 +79,12 @@ export default async function handler(req, res) {
             "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({
-
-            title: p.title,
-            category_id: p.category_id,
-            price: Number(p.price),
-            currency_id: "BRL",
-            available_quantity: 10,
-            buying_mode: "buy_it_now",
-            listing_type_id: "gold_special",
-            condition: "new",
-
-            pictures: p.pictures
-              .filter(url => url && url.startsWith("http"))
-              .map(url => ({ source: url })),
-
-            attributes: [
-              { id: "BRAND", value_name: p.marca },
-              { id: "MODEL", value_name: p.modelo },
-              { id: "COLOR", value_name: p.cor },
-              { id: "GENDER", value_name: p.sexo },
-              { id: "SIZE", value_name: p.tamanho || "M" }
-            ]
-
-          })
+          body: JSON.stringify(body)
         });
 
         const data = await response.json();
 
+        // DEBUG IMPORTANTE
         if (!response.ok || data.error) {
 
           results.push({
