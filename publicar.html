@@ -2,89 +2,216 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-
 <link rel="icon" href="https://raw.githubusercontent.com/hiagorhyanns/mercado-livre-api/29a8c4b095c3e39ee5ecf28f0e4be283621d5f61/img/conectado-ml.png">
 <title>:: Publicar Anúncios ::</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-* { font-family: 'Inter'; box-sizing: border-box; }
-body { background:#ededed; }
+* { font-family: 'Inter'; box-sizing: border-box; margin: 0; padding: 0; }
 
-.container { width:900px; margin:40px auto; }
+body { background: #f0f2f5; min-height: 100vh; }
 
-.row { display:flex; gap:10px; }
+/* HEADER */
+.header {
+  background: #fff159;
+  padding: 14px 30px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header-title { font-size: 18px; font-weight: 700; color: #333; }
+.header-sub   { font-size: 13px; color: #555; margin-left: auto; }
+
+/* CONTAINER */
+.container { max-width: 980px; margin: 30px auto; padding: 0 20px 80px; }
+
+/* CARD */
+.card {
+  background: white;
+  padding: 24px;
+  margin-bottom: 16px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border: 1px solid #e8e8e8;
+  position: relative;
+}
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.card-num {
+  font-size: 13px;
+  font-weight: 600;
+  color: #3483fa;
+  background: #e8f0fe;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+/* FIELDS */
+label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.field { margin-bottom: 14px; }
+.field-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.field-row .field { flex: 1; min-width: 140px; }
 
 input, textarea, select {
-  padding:10px;
-  border:1px solid #ccc;
-  border-radius:5px;
-  width:100%;
-  margin-bottom:10px;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  width: 100%;
+  font-size: 14px;
+  font-family: 'Inter';
+  transition: border-color 0.2s;
+  background: #fafafa;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: #3483fa;
+  outline: none;
+  background: white;
+}
+textarea { height: 70px; resize: vertical; }
+
+/* TITULO AUTO */
+.titulo-wrap { position: relative; }
+.titulo-counter {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  font-size: 11px;
+  color: #aaa;
+  pointer-events: none;
 }
 
-textarea { height:80px; }
+/* RESULT TABLE */
+.result-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+.result-ok   { background: #e8f8ef; color: #007a35; }
+.result-err  { background: #fff0f0; color: #cc0000; }
+.result-link { font-size: 11px; color: #3483fa; margin-left: auto; }
 
+/* BOTÕES */
+.btn-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: white;
+  border-top: 1px solid #e0e0e0;
+  padding: 12px 30px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  z-index: 200;
+}
 button {
-  padding:12px;
-  border:none;
-  border-radius:5px;
-  font-weight:bold;
-  cursor:pointer;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: 'Inter';
+  transition: opacity 0.2s, transform 0.1s;
 }
-
-.add { background:#3483fa; color:white; }
-.publish { background:#00a650; color:white; }
-
-.card {
-  background:white;
-  padding:20px;
-  margin-bottom:15px;
-  border-radius:8px;
+button:active { transform: scale(0.98); }
+.btn-add     { background: #e8f0fe; color: #3483fa; }
+.btn-publish { background: #3483fa; color: white; min-width: 200px; }
+.btn-publish:hover { background: #2968c8; }
+.btn-remove  {
+  background: transparent;
+  color: #ccc;
+  padding: 4px 10px;
+  font-size: 18px;
+  line-height: 1;
 }
+.btn-remove:hover { color: #ff3b3b; }
+
+/* SPINNER */
+.spinner {
+  display: inline-block;
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 
 /* ALERT */
 .alert {
-  position:fixed;
-  top:20px;
-  left:50%;
-  transform:translateX(-50%);
-  padding:15px 25px;
-  border-radius:6px;
-  font-weight:bold;
-  color:white;
-  z-index:999;
-  animation:fadeOut 4s forwards;
+  position: fixed;
+  top: 20px; left: 50%;
+  transform: translateX(-50%);
+  padding: 14px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  color: white;
+  z-index: 999;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  animation: fadeOut 4s forwards;
+  white-space: nowrap;
 }
-
-.success { background:#00a650; }
-.error { background:#ff3b3b; }
-
+.success { background: #00a650; }
+.error   { background: #ff3b3b; }
 @keyframes fadeOut {
-  0% {opacity:1;}
-  80% {opacity:1;}
-  100% {opacity:0;}
+  0%,80% { opacity: 1; }
+  100%    { opacity: 0; }
 }
+
+/* RESULTADOS */
+#resultArea { margin-bottom: 20px; }
+.result-header { font-size: 15px; font-weight: 700; color: #333; margin-bottom: 12px; }
 </style>
 </head>
-
 <body>
+
+<div class="header">
+  <span style="font-size:22px">🛍️</span>
+  <span class="header-title">Publicar Anúncios em Massa</span>
+  <span class="header-sub" id="contadorLabel">0 anúncios</span>
+</div>
+
 <div class="container">
+  <div id="resultArea"></div>
+  <div id="formArea"></div>
+</div>
 
-<div id="formArea"></div>
-
-<button class="add" onclick="addForm()">Criar mais +1 anúncio</button>
-<button class="publish" onclick="publicar()">Publicar anúncios em massa</button>
-
+<div class="btn-bar">
+  <button class="btn-add" onclick="addForm()">+ Adicionar anúncio</button>
+  <button class="btn-publish" id="btnPublish" onclick="publicar()">
+    Publicar tudo
+  </button>
 </div>
 
 <script>
-
 const token = new URLSearchParams(window.location.search).get("token");
 
-// ALERTA
-function showAlert(msg, type="success"){
+let cardCount = 0;
+
+// ─── ALERT ───────────────────────────────────────────────────────────────────
+function showAlert(msg, type = "success") {
   const div = document.createElement("div");
   div.className = `alert ${type}`;
   div.innerText = msg;
@@ -92,96 +219,217 @@ function showAlert(msg, type="success"){
   setTimeout(() => div.remove(), 4000);
 }
 
-// PREÇO
-function formatarPreco(input){
+// ─── PREÇO ───────────────────────────────────────────────────────────────────
+function formatarPreco(input) {
   let v = input.value.replace(/\D/g, "");
-  v = (v / 100).toFixed(2);
-  v = v.replace(".", ",");
-  v = v.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  if (!v) { input.value = ""; return; }
+  v = (parseInt(v) / 100).toFixed(2);
+  v = v.replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   input.value = "R$ " + v;
 }
 
-// TÍTULO AUTO
-function gerarTitulo(card){
-  const get = name => card.querySelector(`[name="${name}"]`).value;
-
-  let titulo = `${get("produto")} ${get("modelo")} ${get("marca")} ${get("cor")} ${get("sexo")}`;
-  titulo = titulo.trim().substring(0, 60);
-
-  card.querySelector('[name="titulo"]').value = titulo;
+// ─── TÍTULO AUTO ─────────────────────────────────────────────────────────────
+function gerarTitulo(card) {
+  const get = name => {
+    const el = card.querySelector(`[name="${name}"]`);
+    return el ? el.value.trim() : "";
+  };
+  const parts = [get("produto"), get("modelo"), get("marca"), get("cor"), get("sexo")]
+    .filter(Boolean).join(" ").substring(0, 60);
+  const tInput = card.querySelector('[name="titulo"]');
+  tInput.value = parts;
+  atualizarContador(tInput);
 }
 
-// FORM
-function addForm(){
+function atualizarContador(input) {
+  const counter = input.closest(".titulo-wrap")?.querySelector(".titulo-counter");
+  if (counter) counter.textContent = input.value.length + "/60";
+}
+
+// ─── REMOVER CARD ────────────────────────────────────────────────────────────
+function removerCard(btn) {
+  btn.closest(".card").remove();
+  atualizarNumeracao();
+}
+
+function atualizarNumeracao() {
+  document.querySelectorAll(".card").forEach((card, i) => {
+    const num = card.querySelector(".card-num");
+    if (num) num.textContent = `Anúncio ${i + 1}`;
+  });
+  atualizarContadorLabel();
+}
+
+function atualizarContadorLabel() {
+  const n = document.querySelectorAll(".card").length;
+  document.getElementById("contadorLabel").textContent = `${n} anúncio${n !== 1 ? "s" : ""}`;
+}
+
+// ─── ADD FORM ─────────────────────────────────────────────────────────────────
+function addForm() {
+  cardCount++;
   const div = document.createElement("div");
   div.className = "card";
 
   div.innerHTML = `
-    <select name="categoria">
-      <option value="MLB1430">Vestidos</option>
-    </select>
-
-    <div class="row">
-      <input name="img1" placeholder="Imagem 1 URL" required>
-      <input name="img2" placeholder="Imagem 2 URL">
-      <input name="img3" placeholder="Imagem 3 URL">
-      <input name="img4" placeholder="Imagem 4 URL">
+    <div class="card-header">
+      <span class="card-num">Anúncio ${document.querySelectorAll(".card").length + 1}</span>
+      <button class="btn-remove" onclick="removerCard(this)" title="Remover">×</button>
     </div>
 
-    <div class="row">
-      <input name="produto" placeholder="Produto" required oninput="gerarTitulo(this.closest('.card'))">
-      <input name="modelo" placeholder="Modelo" required oninput="gerarTitulo(this.closest('.card'))">
-      <input name="marca" placeholder="Marca" required oninput="gerarTitulo(this.closest('.card'))">
-
-      <select name="cor" required onchange="gerarTitulo(this.closest('.card'))">
-        <option value="">Cor</option>
-        <option>Preto</option>
-        <option>Branco</option>
-        <option>Vermelho</option>
-        <option>Azul</option>
-        <option>Verde</option>
-      </select>
-
-      <select name="sexo" required onchange="gerarTitulo(this.closest('.card'))">
-        <option value="">Sexo</option>
-        <option>Feminino</option>
-        <option>Masculino</option>
-      </select>
-
-      <select name="tamanho" required>
-        <option value="">Tamanho</option>
-        <option>P</option>
-        <option>M</option>
-        <option>G</option>
-        <option>GG</option>
+    <!-- CATEGORIA -->
+    <div class="field">
+      <label>Categoria</label>
+      <select name="categoria">
+        <option value="MLB1430">Vestidos (MLB1430)</option>
+        <option value="MLB1196">Blusas e Camisetas Femininas (MLB1196)</option>
+        <option value="MLB1292">Calças Femininas (MLB1292)</option>
+        <option value="MLB1294">Saias (MLB1294)</option>
+        <option value="MLB1435">Macacões e Macaquinhos (MLB1435)</option>
+        <option value="MLB1182">Conjuntos Femininos (MLB1182)</option>
       </select>
     </div>
 
-    <input name="titulo" placeholder="Nome completo do produto" maxlength="60" required>
+    <!-- IMAGENS -->
+    <div class="field">
+      <label>URLs das Imagens</label>
+      <div class="field-row">
+        <div class="field"><input name="img1" placeholder="Imagem 1 (obrigatória)" required></div>
+        <div class="field"><input name="img2" placeholder="Imagem 2"></div>
+        <div class="field"><input name="img3" placeholder="Imagem 3"></div>
+        <div class="field"><input name="img4" placeholder="Imagem 4"></div>
+      </div>
+    </div>
 
-    <textarea name="descricao"></textarea>
+    <!-- DADOS DO PRODUTO -->
+    <div class="field-row">
+      <div class="field">
+        <label>Produto</label>
+        <input name="produto" placeholder="ex: Vestido Midi" required oninput="gerarTitulo(this.closest('.card'))">
+      </div>
+      <div class="field">
+        <label>Modelo</label>
+        <input name="modelo" placeholder="ex: Floral Manga Curta" oninput="gerarTitulo(this.closest('.card'))">
+      </div>
+      <div class="field">
+        <label>Marca</label>
+        <input name="marca" placeholder="ex: Zara" required oninput="gerarTitulo(this.closest('.card'))">
+      </div>
+    </div>
 
-    <input name="preco" placeholder="Preço" oninput="formatarPreco(this)" required>
+    <div class="field-row">
+      <div class="field">
+        <label>Cor</label>
+        <select name="cor" required onchange="gerarTitulo(this.closest('.card'))">
+          <option value="">Selecione</option>
+          <option>Preto</option>
+          <option>Branco</option>
+          <option>Vermelho</option>
+          <option>Azul</option>
+          <option>Rosa</option>
+          <option>Verde</option>
+          <option>Amarelo</option>
+          <option>Roxo</option>
+          <option>Laranja</option>
+          <option>Cinza</option>
+          <option>Bege</option>
+          <option>Marrom</option>
+          <option>Vinho</option>
+          <option>Nude</option>
+          <option>Estampado</option>
+          <option>Multicolorido</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Gênero</label>
+        <select name="sexo" required onchange="gerarTitulo(this.closest('.card'))">
+          <option value="">Selecione</option>
+          <option value="Feminino">Feminino</option>
+          <option value="Masculino">Masculino</option>
+          <option value="Unissex">Unissex</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Tamanho</label>
+        <select name="tamanho" required>
+          <option value="">Selecione</option>
+          <optgroup label="Numérico">
+            <option>34</option>
+            <option>36</option>
+            <option>38</option>
+            <option>40</option>
+            <option>42</option>
+            <option>44</option>
+            <option>46</option>
+            <option>48</option>
+            <option>50</option>
+          </optgroup>
+          <optgroup label="Letras">
+            <option>PP</option>
+            <option>P</option>
+            <option>M</option>
+            <option>G</option>
+            <option>GG</option>
+            <option>XGG</option>
+          </optgroup>
+          <optgroup label="Único">
+            <option>Único</option>
+          </optgroup>
+        </select>
+      </div>
+    </div>
+
+    <!-- TÍTULO (GERADO AUTO) -->
+    <div class="field">
+      <label>Título do Anúncio (máx. 60 caracteres)</label>
+      <div class="titulo-wrap">
+        <input name="titulo" placeholder="Gerado automaticamente ou edite manualmente" maxlength="60" required
+          oninput="atualizarContador(this)">
+        <span class="titulo-counter">0/60</span>
+      </div>
+    </div>
+
+    <!-- DESCRIÇÃO -->
+    <div class="field">
+      <label>Descrição</label>
+      <textarea name="descricao" placeholder="Descrição do produto (opcional)"></textarea>
+    </div>
+
+    <!-- PREÇO -->
+    <div class="field" style="max-width:220px">
+      <label>Preço</label>
+      <input name="preco" placeholder="R$ 0,00" oninput="formatarPreco(this)" required>
+    </div>
   `;
 
   document.getElementById("formArea").appendChild(div);
+  atualizarContadorLabel();
 }
 
+// INICIAR COM 1 FORM
 addForm();
 
-// PUBLICAR
-async function publicar(){
+// ─── PUBLICAR ─────────────────────────────────────────────────────────────────
+async function publicar() {
+  const btn = document.getElementById("btnPublish");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Publicando...';
+
+  const resultArea = document.getElementById("resultArea");
+  resultArea.innerHTML = "";
 
   const cards = document.querySelectorAll(".card");
   const produtos = [];
 
-  const get = (card, name) => card.querySelector(`[name="${name}"]`).value;
+  const get = (card, name) => {
+    const el = card.querySelector(`[name="${name}"]`);
+    return el ? el.value.trim() : "";
+  };
 
   for (const card of cards) {
-
-    const title = get(card, "titulo").trim();
-    const preco = get(card, "preco").replace(/\D/g, "") / 100;
-    const categoria = get(card, "categoria");
+    const title  = get(card, "titulo");
+    const precoRaw = get(card, "preco").replace(/\D/g, "");
+    const preco  = precoRaw ? parseInt(precoRaw) / 100 : 0;
 
     const imagens = [
       get(card, "img1"),
@@ -190,48 +438,69 @@ async function publicar(){
       get(card, "img4")
     ].filter(Boolean);
 
-    if (!title || !preco || imagens.length === 0) {
-      showAlert("Preencha todos os campos obrigatórios", "error");
+    if (!title || !preco || imagens.length === 0 || !get(card, "cor") || !get(card, "tamanho") || !get(card, "sexo")) {
+      showAlert("Preencha todos os campos obrigatórios antes de publicar", "error");
+      btn.disabled = false;
+      btn.innerHTML = "Publicar tudo";
       return;
     }
 
     produtos.push({
       title,
       description: get(card, "descricao"),
-      category_id: categoria,
-      price: preco,
-      pictures: imagens,
-
-      produto: get(card, "produto"),
-      modelo: get(card, "modelo"),
-      marca: get(card, "marca"),
-      cor: get(card, "cor"),
-      sexo: get(card, "sexo"),
-      tamanho: get(card, "tamanho")
+      category_id: get(card, "categoria"),
+      price:       preco,
+      pictures:    imagens,
+      marca:       get(card, "marca"),
+      modelo:      get(card, "modelo"),
+      cor:         get(card, "cor"),
+      sexo:        get(card, "sexo"),
+      tamanho:     get(card, "tamanho")
     });
   }
 
-  const res = await fetch("/api/create-items", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ produtos, token })
-  });
+  try {
+    const res = await fetch("/api/create-items", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ produtos, token })
+    });
 
-  const data = await res.json();
+    const data = await res.json();
+    console.log("Resultado:", data);
 
-  console.log(data);
+    // RENDERIZAR RESULTADOS
+    const hasErr = data.some(r => r.erro);
+    const header = document.createElement("div");
+    header.className = "result-header";
+    header.textContent = hasErr
+      ? `⚠️ Publicação concluída com erros (${data.filter(r=>r.erro).length} falha(s))`
+      : `✅ ${data.length} anúncio(s) publicado(s) com sucesso!`;
+    resultArea.appendChild(header);
 
-  const erro = data.find(r => r.erro);
+    data.forEach(r => {
+      const row = document.createElement("div");
+      row.className = `result-row ${r.sucesso ? "result-ok" : "result-err"}`;
+      row.innerHTML = r.sucesso
+        ? `<span>✔</span> <b>${r.produto}</b> — ID: ${r.id}
+           ${r.link ? `<a class="result-link" href="${r.link}" target="_blank">Ver anúncio ↗</a>` : ""}`
+        : `<span>✖</span> <b>${r.produto}</b> — ${typeof r.detalhe === "object" ? (r.detalhe.message || JSON.stringify(r.detalhe)) : r.detalhe}`;
+      resultArea.appendChild(row);
+    });
 
-  if (erro) {
-    console.log("Erro real:", erro.detalhe);
-    showAlert("Erro ao publicar (F12)", "error");
-  } else {
-    showAlert("Anúncios publicados com sucesso!", "success");
+    resultArea.scrollIntoView({ behavior: "smooth" });
+
+    if (!hasErr) showAlert(`${data.length} anúncio(s) publicado(s)!`, "success");
+    else          showAlert("Verifique os erros acima", "error");
+
+  } catch (err) {
+    showAlert("Erro de conexão: " + err.message, "error");
+    console.error(err);
   }
+
+  btn.disabled = false;
+  btn.innerHTML = "Publicar tudo";
 }
-
 </script>
-
 </body>
 </html>
