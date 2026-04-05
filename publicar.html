@@ -550,78 +550,76 @@ async function publicar() {
   document.getElementById("resultArea").innerHTML = "";
 
   if (!token) {
-    showAlert("Token não encontrado — reconecte sua conta", "er");
-    btn.disabled = false; btn.innerHTML = "Publicar tudo";
-    return;
+    showAlert("Token não encontrado — reconecte sua conta","er");
+    btn.disabled = false; btn.innerHTML = "Publicar tudo"; return;
   }
 
-  const cards = document.querySelectorAll(".card");
-  const resultados = [];
+  const cards   = document.querySelectorAll(".card");
+  const produtos = [];
 
   for (const card of cards) {
     const erro = validar(card);
-    if (erro) {
-      showAlert(erro, "er");
-      btn.disabled = false; btn.innerHTML = "Publicar tudo";
-      return;
-    }
+    if (erro) { showAlert(erro,"er"); btn.disabled=false; btn.innerHTML="Publicar tudo"; return; }
 
-    const { body, descricao, titulo } = montarBody(card);
-
-    // LOG no console do browser para debug
-    console.log("══ BODY ENVIADO À ML ══");
-    console.log(JSON.stringify(body, null, 2));
-
-    try {
-      // ── 1. Criar item
-      const mlRes = await fetch("https://api.mercadolibre.com/items", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type":  "application/json"
-        },
-        body: JSON.stringify(body)
-      });
-
-      const mlData = await mlRes.json();
-      console.log("══ RESPOSTA ML ══");
-      console.log(JSON.stringify(mlData, null, 2));
-
-      if (!mlRes.ok || mlData.error) {
-        resultados.push({ erro: true, titulo, mlData });
-        continue;
-      }
-
-      // ── 2. Descrição (endpoint separado)
-      if (descricao) {
-        await fetch(`https://api.mercadolibre.com/items/${mlData.id}/description`, {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type":  "application/json"
-          },
-          body: JSON.stringify({ plain_text: descricao })
-        }).catch(e => console.warn("Descrição não salva:", e));
-      }
-
-      resultados.push({ sucesso: true, titulo, id: mlData.id, link: mlData.permalink });
-
-    } catch (err) {
-      resultados.push({ erro: true, titulo, mlData: { message: err.message } });
-    }
+    // Coleta dados do card
+    const g = n => { const e=card.querySelector(`[name="${n}"]`); return e?e.value.trim():""; };
+    const precoRaw = g("preco").replace(/\D/g,"");
+    const freteEl  = card.querySelector('[name="frete_gratis"]');
+    produtos.push({
+      title:           g("titulo"),
+      descricao:       g("descricao"),
+      category_id:     g("categoria"),
+      listing_type:    g("listing_type")||"gold_special",
+      condition:       g("condition")||"new",
+      price:           precoRaw ? parseInt(precoRaw,10)/100 : 0,
+      quantidade:      parseInt(g("quantidade"),10)||10,
+      frete_gratis:    freteEl ? freteEl.checked : false,
+      pictures:        ["img1","img2","img3","img4"].map(n=>g(n)).filter(u=>u&&u.startsWith("http")),
+      marca:           g("marca"),
+      modelo:          g("modelo"),
+      cor:             g("cor"),
+      sexo:            g("sexo"),
+      tamanho:         g("tamanho"),
+      sku:             g("sku"),
+      garantia:        g("garantia"),
+      material:        g("material"),
+      comprimento:     g("comprimento"),
+      manga:           g("manga"),
+      gola:            g("gola"),
+      tipo_vestido:    g("tipo_vestido"),
+      temporada:       g("temporada"),
+      faixa_etaria:    g("faixa_etaria"),
+      gestante:        g("gestante"),
+      ocasioes:        getChips(card,"ocasioes").join(", "),
+      estilos:         getChips(card,"estilos").join(", "),
+      peso_kg:         parseFloat(g("peso_kg"))||null,
+      largura_cm:      parseFloat(g("largura_cm"))||null,
+      altura_cm:       parseFloat(g("altura_cm"))||null,
+      profundidade_cm: parseFloat(g("profundidade_cm"))||null
+    });
   }
 
-  renderResultados(resultados);
-
-  const erros = resultados.filter(r => r.erro).length;
-  if (!erros) showAlert(`✅ ${resultados.length} anúncio(s) publicado(s) com sucesso!`, "ok");
-  else        showAlert(`⚠️ ${erros} erro(s) — veja detalhes acima`, "er");
+  try {
+    const res  = await fetch("/api/create-items", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ produtos, token })
+    });
+    const data = await res.json();
+    console.log("Resposta /api/create-items:", data);
+    renderResultados(data);
+    const erros = data.filter(r => r.erro).length;
+    if (!erros) showAlert(`✅ ${data.length} anúncio(s) publicado(s) com sucesso!`,"ok");
+    else        showAlert(`⚠️ ${erros} erro(s) — veja detalhes acima`,"er");
+  } catch(err) {
+    showAlert("Erro ao chamar /api/create-items: "+err.message,"er");
+    console.error(err);
+  }
 
   btn.disabled = false;
   btn.innerHTML = "Publicar tudo";
 }
 
-/* ── RENDERIZAR RESULTADOS ──────────────────────────────────────── */
 function renderResultados(data) {
   const area = document.getElementById("resultArea");
   area.innerHTML = "";
