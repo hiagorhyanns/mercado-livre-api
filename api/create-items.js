@@ -1,118 +1,93 @@
 export default async function handler(req, res) {
-
   try {
-
     const { produtos, token } = req.body;
 
-    if (!produtos || !Array.isArray(produtos) || produtos.length === 0) {
+    if (!produtos || !Array.isArray(produtos) || produtos.length === 0)
       return res.status(400).json({ error: "Nenhum produto enviado" });
-    }
-    if (!token) {
+
+    if (!token)
       return res.status(400).json({ error: "Token não enviado" });
-    }
 
     const results = [];
 
-    // Cache de atributos da categoria (evita requisições repetidas)
-    const categoryAttrCache = {};
-
     for (const p of produtos) {
 
-      if (!p.title || !p.category_id || !p.price || !p.pictures?.length || !p.marca || !p.cor || !p.sexo || !p.tamanho) {
-        results.push({ erro: true, produto: p.title || "Sem título", detalhe: "Preencha todos os campos obrigatórios" });
+      if (!p.title || !p.category_id || !p.price || !p.pictures?.length) {
+        results.push({ erro: true, produto: p.title || "Sem título", detalhe: "Campos obrigatórios faltando" });
         continue;
       }
 
       try {
 
-        // ── 1. BUSCAR ATRIBUTOS OBRIGATÓRIOS DA CATEGORIA ──────────────────
-        // Endpoint público — não precisa de token
-        if (!categoryAttrCache[p.category_id]) {
-          const attrRes = await fetch(
-            `https://api.mercadolibre.com/categories/${p.category_id}/attributes`
-          );
-          categoryAttrCache[p.category_id] = attrRes.ok ? await attrRes.json() : [];
-        }
-
-        const categoryAttrs = categoryAttrCache[p.category_id];
-
-        // Atributos que vão para variations (não duplicar nos attributes fixos)
-        const VARIATION_ATTRS = new Set(["COLOR", "SIZE"]);
-
-        // Atributos que já incluímos explicitamente
-        const ALWAYS_INCLUDED = new Set(["BRAND", "GENDER", "MODEL", "COLOR", "SIZE"]);
-
-        // ── 2. MONTAR attributes FIXOS ─────────────────────────────────────
-        // Inclui: os nossos padrão + extras enviados pelo frontend + qualquer
-        // obrigatório que ainda não está coberto (com 1º valor permitido como default)
-
-        const fixedAttributes = [
-          { id: "BRAND",  value_name: p.marca },
-          { id: "GENDER", value_name: p.sexo  },
-          ...(p.modelo ? [{ id: "MODEL", value_name: p.modelo }] : [])
-        ];
-
-        // Extras enviados explicitamente pelo frontend (campos dinâmicos)
-        if (Array.isArray(p.extra_attributes)) {
-          for (const ea of p.extra_attributes) {
-            if (ea.id && !VARIATION_ATTRS.has(ea.id) && !ALWAYS_INCLUDED.has(ea.id)) {
-              fixedAttributes.push(ea);
-            }
-          }
-        }
-
-        // Verificar se ficou algum obrigatório sem valor → usar 1º allowed_value como fallback
-        const coveredIds = new Set(fixedAttributes.map(a => a.id));
-
-        for (const attr of categoryAttrs) {
-          if (
-            attr.tags?.required === true &&
-            !VARIATION_ATTRS.has(attr.id) &&
-            !coveredIds.has(attr.id)
-          ) {
-            if (attr.allowed_values && attr.allowed_values.length > 0) {
-              // Usa o primeiro valor permitido como fallback automático
-              const first = attr.allowed_values[0];
-              fixedAttributes.push({ id: attr.id, value_id: first.id, value_name: first.name });
-              coveredIds.add(attr.id);
-            }
-            // Se não tem allowed_values e não foi enviado pelo usuário, não há como resolver
-          }
-        }
-
-        // ── 3. PICTURES ────────────────────────────────────────────────────
+        // ── PICTURES ────────────────────────────────────────────────────────
         const pictures = p.pictures
           .filter(url => url && url.startsWith("http"))
           .map(url => ({ source: url }));
 
-        // ── 4. BODY FINAL ──────────────────────────────────────────────────
-        // attribute_combinations DENTRO de variations — esse era o bug principal
-        const body = {
-          title:            p.title,
-          category_id:      p.category_id,
-          currency_id:      "BRL",
-          buying_mode:      "buy_it_now",
-          listing_type_id:  "gold_special",
-          condition:        "new",
-          pictures,
+        // ── ATTRIBUTES ──────────────────────────────────────────────────────
+        // Quando NÃO se usa variations, COLOR e SIZE vão em attributes normalmente
+        const attributes = [];
 
-          // ✅ CORRETO: preço e qty ficam dentro de cada variation
-          variations: [
-            {
-              attribute_combinations: [
-                { id: "COLOR", value_name: p.cor     },
-                { id: "SIZE",  value_name: p.tamanho }
-              ],
-              price:              Number(p.price),
-              available_quantity: 10
-            }
-          ],
-
-          // Atributos fixos (não variam por SKU)
-          attributes: fixedAttributes
+        const add = (id, value_name, value_id) => {
+          if (!value_name) return;
+          const obj = { id, value_name: String(value_name) };
+          if (value_id) obj.value_id = value_id;
+          attributes.push(obj);
         };
 
-        // ── 5. CRIAR ITEM ──────────────────────────────────────────────────
+        // Fixos principais
+        add("BRAND",  p.marca);
+        add("GENDER", p.sexo);
+        add("MODEL",  p.modelo);
+        add("COLOR",  p.cor);
+        add("SIZE",   p.tamanho);
+
+        // Extras dinâmicos enviados pelo frontend
+        if (Array.isArray(p.extra_attributes)) {
+          for (const ea of p.extra_attributes) {
+            if (ea.id && ea.value_name) {
+              const obj = { id: ea.id, value_name: String(ea.value_name) };
+              if (ea.value_id) obj.value_id = ea.value_id;
+              attributes.push(obj);
+            }
+          }
+        }
+
+        // ── SHIPPING ────────────────────────────────────────────────────────
+        const shipping = { mode: "me2", free_shipping: false };
+
+        if (p.peso_kg && p.largura_cm && p.altura_cm && p.profundidade_cm) {
+          shipping.dimensions = {
+            width:  { value: Number(p.largura_cm),      unit: "cm" },
+            height: { value: Number(p.altura_cm),       unit: "cm" },
+            length: { value: Number(p.profundidade_cm), unit: "cm" }
+          };
+        }
+
+        // ── WARRANTY ────────────────────────────────────────────────────────
+        // ML aceita warranty como atributo de texto livre ou campo da raiz
+        const warrantyText = p.garantia ? p.garantia : "Sem garantia";
+
+        // ── BODY FINAL ──────────────────────────────────────────────────────
+        // SEM variations → price e available_quantity ficam na raiz
+        const body = {
+          title:              p.title,
+          category_id:        p.category_id,
+          price:              Number(p.price),
+          currency_id:        "BRL",
+          available_quantity: Number(p.quantidade || 10),
+          buying_mode:        "buy_it_now",
+          // Clássico = gold_special | Premium = gold_pro
+          listing_type_id:    p.listing_type || "gold_special",
+          condition:          "new",
+          warranty:           warrantyText,
+          pictures,
+          shipping,
+          attributes,
+          ...(p.sku ? { seller_custom_field: p.sku } : {})
+        };
+
+        // ── CRIAR ITEM ──────────────────────────────────────────────────────
         const response = await fetch("https://api.mercadolibre.com/items", {
           method: "POST",
           headers: {
@@ -124,17 +99,21 @@ export default async function handler(req, res) {
 
         const data = await response.json();
 
+        // Debug completo no console do servidor
+        console.log("ML body enviado:", JSON.stringify(body, null, 2));
+        console.log("ML resposta:", JSON.stringify(data, null, 2));
+
         if (!response.ok || data.error) {
           results.push({
             erro:    true,
             produto: p.title,
             status:  response.status,
-            detalhe: data   // inclui data.cause com campos faltantes
+            detalhe: data
           });
           continue;
         }
 
-        // ── 6. DESCRIÇÃO SEPARADA ─────────────────────────────────────────
+        // ── DESCRIÇÃO SEPARADA ───────────────────────────────────────────────
         if (p.description && p.description.trim()) {
           const descRes = await fetch(
             `https://api.mercadolibre.com/items/${data.id}/description`,
@@ -148,8 +127,7 @@ export default async function handler(req, res) {
             }
           );
           if (!descRes.ok) {
-            const descErr = await descRes.json();
-            console.warn(`Descrição não salva (${data.id}):`, descErr);
+            console.warn("Descrição não salva:", await descRes.json());
           }
         }
 
