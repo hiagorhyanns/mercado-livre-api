@@ -1,10 +1,51 @@
+// ── TRADUÇÃO DE ERROS ML → PORTUGUÊS ────────────────────────────────────────
+const TRADUCOES = {
+  "family_name": "O campo 'family_name' é obrigatório na raiz do body quando se usa variations",
+  "price": "Preço ausente dentro de variations",
+  "available_quantity": "Quantidade em estoque ausente dentro de variations",
+  "attribute_combinations": "Combinações de atributos (cor/tamanho) ausentes em variations",
+  "title": "Título do anúncio é obrigatório",
+  "category_id": "Categoria é obrigatória",
+  "pictures": "Pelo menos uma imagem é obrigatória",
+  "listing_type_id": "Tipo de anúncio inválido",
+  "condition": "Condição do produto inválida",
+  "COLOR": "Atributo COR obrigatório e não informado",
+  "SIZE": "Atributo TAMANHO obrigatório e não informado",
+  "BRAND": "Atributo MARCA obrigatório e não informado",
+  "GENDER": "Atributo GÊNERO obrigatório e não informado",
+  "The body does not contains some or none of the following properties": "O body não contém um ou mais campos obrigatórios",
+  "The field variations is invalid with family name": "O campo 'variations' está inválido — 'family_name' é obrigatório",
+  "item variation with errors": "Variação do item com erros",
+  "invalid_body": "Body da requisição inválido",
+  "missing_field": "Campo obrigatório ausente",
+  "required_field": "Campo obrigatório ausente",
+  "invalid_field": "Campo com valor inválido"
+};
+
+function traduzirErro(texto) {
+  if (!texto) return texto;
+  for (const [en, pt] of Object.entries(TRADUCOES)) {
+    if (texto.includes(en)) return pt;
+  }
+  return texto;
+}
+
+function traduzirCause(cause) {
+  if (!Array.isArray(cause)) return [];
+  return cause.map(c => ({
+    ...c,
+    message_pt: traduzirErro(c.message || c.code || JSON.stringify(c))
+  }));
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+
 export default async function handler(req, res) {
   try {
     const { produtos, token } = req.body;
 
     if (!produtos || !Array.isArray(produtos) || produtos.length === 0)
       return res.status(400).json({ error: "Nenhum produto enviado" });
-
     if (!token)
       return res.status(400).json({ error: "Token não enviado" });
 
@@ -19,30 +60,25 @@ export default async function handler(req, res) {
 
       try {
 
-        // ── PICTURES ────────────────────────────────────────────────────────
+        // ── PICTURES ──────────────────────────────────────────────────────
         const pictures = p.pictures
           .filter(url => url && url.startsWith("http"))
           .map(url => ({ source: url }));
 
-        // ── ATTRIBUTES ──────────────────────────────────────────────────────
-        // Quando NÃO se usa variations, COLOR e SIZE vão em attributes normalmente
+        // ── ATTRIBUTES FIXOS (não variam por SKU) ─────────────────────────
         const attributes = [];
-
-        const add = (id, value_name, value_id) => {
-          if (!value_name) return;
-          const obj = { id, value_name: String(value_name) };
-          if (value_id) obj.value_id = value_id;
+        const add = (id, val, vid) => {
+          if (!val) return;
+          const obj = { id, value_name: String(val) };
+          if (vid) obj.value_id = vid;
           attributes.push(obj);
         };
 
-        // Fixos principais
         add("BRAND",  p.marca);
         add("GENDER", p.sexo);
         add("MODEL",  p.modelo);
-        add("COLOR",  p.cor);
-        add("SIZE",   p.tamanho);
 
-        // Extras dinâmicos enviados pelo frontend
+        // Extras dinâmicos do frontend
         if (Array.isArray(p.extra_attributes)) {
           for (const ea of p.extra_attributes) {
             if (ea.id && ea.value_name) {
@@ -53,8 +89,11 @@ export default async function handler(req, res) {
           }
         }
 
-        // ── SHIPPING ────────────────────────────────────────────────────────
-        const shipping = { mode: "me2", free_shipping: false };
+        // ── SHIPPING ──────────────────────────────────────────────────────
+        const shipping = {
+          mode: "me2",
+          free_shipping: p.frete_gratis === true || p.frete_gratis === "true"
+        };
 
         if (p.peso_kg && p.largura_cm && p.altura_cm && p.profundidade_cm) {
           shipping.dimensions = {
@@ -64,30 +103,48 @@ export default async function handler(req, res) {
           };
         }
 
-        // ── WARRANTY ────────────────────────────────────────────────────────
-        // ML aceita warranty como atributo de texto livre ou campo da raiz
-        const warrantyText = p.garantia ? p.garantia : "Sem garantia";
+        // ── BODY FINAL ────────────────────────────────────────────────────
+        // Categorias como Vestidos EXIGEM variations.
+        // Quando variations é usado:
+        //   • family_name  → OBRIGATÓRIO na RAIZ do body
+        //   • price        → DENTRO de cada variation
+        //   • available_quantity → DENTRO de cada variation
+        //   • COLOR e SIZE → dentro de attribute_combinations de cada variation
 
-        // ── BODY FINAL ──────────────────────────────────────────────────────
-        // SEM variations → price e available_quantity ficam na raiz
         const body = {
-          title:              p.title,
-          category_id:        p.category_id,
-          price:              Number(p.price),
-          currency_id:        "BRL",
-          available_quantity: Number(p.quantidade || 10),
-          buying_mode:        "buy_it_now",
-          // Clássico = gold_special | Premium = gold_pro
-          listing_type_id:    p.listing_type || "gold_special",
-          condition:          "new",
-          warranty:           warrantyText,
+          title:             p.title,
+          category_id:       p.category_id,
+          currency_id:       "BRL",
+          buying_mode:       "buy_it_now",
+          listing_type_id:   p.listing_type || "gold_special",
+          condition:         p.condition    || "new",
+          warranty:          p.garantia     || "Sem garantia",
           pictures,
           shipping,
           attributes,
-          ...(p.sku ? { seller_custom_field: p.sku } : {})
+
+          // ✅ family_name OBRIGATÓRIO na raiz quando há variations
+          family_name: p.title.substring(0, 60),
+
+          // ✅ variations com price e qty DENTRO
+          variations: [
+            {
+              attribute_combinations: [
+                { id: "COLOR", value_name: p.cor     },
+                { id: "SIZE",  value_name: p.tamanho }
+              ],
+              price:              Number(p.price),
+              available_quantity: Number(p.quantidade || 10),
+              ...(p.sku ? { seller_custom_field: p.sku } : {})
+            }
+          ]
         };
 
-        // ── CRIAR ITEM ──────────────────────────────────────────────────────
+        // ── LOG COMPLETO PARA DEBUG ────────────────────────────────────────
+        console.log("── BODY ENVIADO ──");
+        console.log(JSON.stringify(body, null, 2));
+
+        // ── CRIAR ITEM ────────────────────────────────────────────────────
         const response = await fetch("https://api.mercadolibre.com/items", {
           method: "POST",
           headers: {
@@ -98,37 +155,30 @@ export default async function handler(req, res) {
         });
 
         const data = await response.json();
-
-        // Debug completo no console do servidor
-        console.log("ML body enviado:", JSON.stringify(body, null, 2));
-        console.log("ML resposta:", JSON.stringify(data, null, 2));
+        console.log("── RESPOSTA ML ──");
+        console.log(JSON.stringify(data, null, 2));
 
         if (!response.ok || data.error) {
           results.push({
             erro:    true,
             produto: p.title,
             status:  response.status,
-            detalhe: data
+            detalhe: {
+              ...data,
+              // Traduzir cause para o frontend mostrar em português
+              cause_pt: traduzirCause(data.cause)
+            }
           });
           continue;
         }
 
-        // ── DESCRIÇÃO SEPARADA ───────────────────────────────────────────────
+        // ── DESCRIÇÃO (endpoint separado) ─────────────────────────────────
         if (p.description && p.description.trim()) {
-          const descRes = await fetch(
-            `https://api.mercadolibre.com/items/${data.id}/description`,
-            {
-              method: "POST",
-              headers: {
-                "Authorization": `Bearer ${token}`,
-                "Content-Type":  "application/json"
-              },
-              body: JSON.stringify({ plain_text: p.description })
-            }
-          );
-          if (!descRes.ok) {
-            console.warn("Descrição não salva:", await descRes.json());
-          }
+          await fetch(`https://api.mercadolibre.com/items/${data.id}/description`, {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+            body: JSON.stringify({ plain_text: p.description })
+          }).catch(e => console.warn("Descrição não salva:", e));
         }
 
         results.push({
@@ -139,13 +189,13 @@ export default async function handler(req, res) {
         });
 
       } catch (err) {
-        results.push({ erro: true, produto: p.title, detalhe: err.toString() });
+        results.push({ erro: true, produto: p.title, detalhe: { message: err.toString() } });
       }
     }
 
     return res.json(results);
 
   } catch (err) {
-    return res.status(500).json({ erro: true, detalhe: err.toString() });
+    return res.status(500).json({ erro: true, detalhe: { message: err.toString() } });
   }
 }
