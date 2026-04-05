@@ -7,180 +7,113 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 * { font-family: 'Inter'; box-sizing: border-box; margin: 0; padding: 0; }
-
 body { background: #f0f2f5; min-height: 100vh; }
 
-/* HEADER */
 .header {
-  background: #fff159;
-  padding: 14px 30px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  background: #fff159; padding: 14px 30px;
+  display: flex; align-items: center; gap: 12px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.12);
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  position: sticky; top: 0; z-index: 100;
 }
 .header-title { font-size: 18px; font-weight: 700; color: #333; }
 .header-sub   { font-size: 13px; color: #555; margin-left: auto; }
 
-/* CONTAINER */
-.container { max-width: 980px; margin: 30px auto; padding: 0 20px 80px; }
+.container { max-width: 980px; margin: 30px auto; padding: 0 20px 100px; }
 
-/* CARD */
 .card {
-  background: white;
-  padding: 24px;
-  margin-bottom: 16px;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  background: white; padding: 24px; margin-bottom: 16px;
+  border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   border: 1px solid #e8e8e8;
-  position: relative;
 }
 .card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 18px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #f0f0f0;
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0;
 }
 .card-num {
-  font-size: 13px;
-  font-weight: 600;
-  color: #3483fa;
-  background: #e8f0fe;
-  padding: 4px 12px;
-  border-radius: 20px;
+  font-size: 13px; font-weight: 600; color: #3483fa;
+  background: #e8f0fe; padding: 4px 12px; border-radius: 20px;
 }
 
-/* FIELDS */
 label {
-  display: block;
-  font-size: 12px;
-  font-weight: 600;
-  color: #555;
-  margin-bottom: 5px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  display: block; font-size: 12px; font-weight: 600;
+  color: #555; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;
 }
 .field { margin-bottom: 14px; }
 .field-row { display: flex; gap: 10px; flex-wrap: wrap; }
 .field-row .field { flex: 1; min-width: 140px; }
 
 input, textarea, select {
-  padding: 10px 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  width: 100%;
-  font-size: 14px;
-  font-family: 'Inter';
-  transition: border-color 0.2s;
-  background: #fafafa;
+  padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px;
+  width: 100%; font-size: 14px; font-family: 'Inter';
+  transition: border-color 0.2s; background: #fafafa;
 }
 input:focus, textarea:focus, select:focus {
-  border-color: #3483fa;
-  outline: none;
-  background: white;
+  border-color: #3483fa; outline: none; background: white;
 }
 textarea { height: 70px; resize: vertical; }
 
-/* TITULO AUTO */
+.extra-box {
+  background: #fffbf0; border: 1px solid #f0c040;
+  border-radius: 8px; padding: 16px; margin-bottom: 14px;
+}
+.extra-box-title {
+  font-size: 12px; font-weight: 700; color: #b8860b;
+  text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;
+}
+
 .titulo-wrap { position: relative; }
 .titulo-counter {
-  position: absolute;
-  right: 10px;
-  top: 10px;
-  font-size: 11px;
-  color: #aaa;
-  pointer-events: none;
+  position: absolute; right: 10px; top: 10px;
+  font-size: 11px; color: #aaa; pointer-events: none;
 }
 
-/* RESULT TABLE */
 .result-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  border-radius: 6px;
-  margin-bottom: 6px;
-  font-size: 13px;
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px 16px; border-radius: 6px; margin-bottom: 6px; font-size: 13px;
 }
-.result-ok   { background: #e8f8ef; color: #007a35; }
-.result-err  { background: #fff0f0; color: #cc0000; }
-.result-link { font-size: 11px; color: #3483fa; margin-left: auto; }
+.result-ok  { background: #e8f8ef; color: #007a35; }
+.result-err { background: #fff0f0; color: #cc0000; }
+.result-cause { font-size: 11px; margin-top: 4px; opacity: 0.85; line-height: 1.5; }
+.result-link { font-size: 11px; color: #3483fa; }
 
-/* BOTÕES */
 .btn-bar {
-  position: fixed;
-  bottom: 0; left: 0; right: 0;
-  background: white;
-  border-top: 1px solid #e0e0e0;
-  padding: 12px 30px;
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  z-index: 200;
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: white; border-top: 1px solid #e0e0e0;
+  padding: 12px 30px; display: flex; gap: 10px; justify-content: center; z-index: 200;
 }
 button {
-  padding: 12px 24px;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 14px;
-  font-family: 'Inter';
+  padding: 12px 24px; border: none; border-radius: 6px;
+  font-weight: 600; cursor: pointer; font-size: 14px; font-family: 'Inter';
   transition: opacity 0.2s, transform 0.1s;
 }
 button:active { transform: scale(0.98); }
 .btn-add     { background: #e8f0fe; color: #3483fa; }
 .btn-publish { background: #3483fa; color: white; min-width: 200px; }
-.btn-publish:hover { background: #2968c8; }
+.btn-publish:disabled { background: #999; cursor: not-allowed; transform: none; }
 .btn-remove  {
-  background: transparent;
-  color: #ccc;
-  padding: 4px 10px;
-  font-size: 18px;
-  line-height: 1;
+  background: transparent; color: #ccc;
+  padding: 4px 10px; font-size: 20px; line-height: 1;
 }
 .btn-remove:hover { color: #ff3b3b; }
 
-/* SPINNER */
 .spinner {
-  display: inline-block;
-  width: 16px; height: 16px;
-  border: 2px solid rgba(255,255,255,0.4);
-  border-top-color: white;
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-  vertical-align: middle;
-  margin-right: 6px;
+  display: inline-block; width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.4); border-top-color: white;
+  border-radius: 50%; animation: spin 0.7s linear infinite;
+  vertical-align: middle; margin-right: 6px;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ALERT */
 .alert {
-  position: fixed;
-  top: 20px; left: 50%;
-  transform: translateX(-50%);
-  padding: 14px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  color: white;
-  z-index: 999;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-  animation: fadeOut 4s forwards;
-  white-space: nowrap;
+  position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+  padding: 14px 24px; border-radius: 8px; font-weight: 600; color: white;
+  z-index: 999; box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  animation: fadeOut 4.5s forwards;
 }
 .success { background: #00a650; }
 .error   { background: #ff3b3b; }
-@keyframes fadeOut {
-  0%,80% { opacity: 1; }
-  100%    { opacity: 0; }
-}
+@keyframes fadeOut { 0%,75%{opacity:1} 100%{opacity:0} }
 
-/* RESULTADOS */
 #resultArea { margin-bottom: 20px; }
 .result-header { font-size: 15px; font-weight: 700; color: #333; margin-bottom: 12px; }
 </style>
@@ -200,149 +133,206 @@ button:active { transform: scale(0.98); }
 
 <div class="btn-bar">
   <button class="btn-add" onclick="addForm()">+ Adicionar anúncio</button>
-  <button class="btn-publish" id="btnPublish" onclick="publicar()">
-    Publicar tudo
-  </button>
+  <button class="btn-publish" id="btnPublish" onclick="publicar()">Publicar tudo</button>
 </div>
 
 <script>
 const token = new URLSearchParams(window.location.search).get("token");
 
-let cardCount = 0;
+// Atributos que já gerenciamos — não vão aparecer como "extras"
+const HANDLED = new Set([
+  "BRAND","GENDER","COLOR","SIZE","MODEL","ALPHANUMERIC_SIZE",
+  "SELLER_SKU","ITEM_CONDITION","GTIN","MPN","PACKAGE_WIDTH",
+  "PACKAGE_HEIGHT","PACKAGE_LENGTH","PACKAGE_WEIGHT"
+]);
+
+const attrCache = {};
 
 // ─── ALERT ───────────────────────────────────────────────────────────────────
 function showAlert(msg, type = "success") {
+  document.querySelectorAll(".alert").forEach(a => a.remove());
   const div = document.createElement("div");
   div.className = `alert ${type}`;
   div.innerText = msg;
   document.body.appendChild(div);
-  setTimeout(() => div.remove(), 4000);
+  setTimeout(() => div.remove(), 4500);
 }
 
 // ─── PREÇO ───────────────────────────────────────────────────────────────────
 function formatarPreco(input) {
   let v = input.value.replace(/\D/g, "");
   if (!v) { input.value = ""; return; }
-  v = (parseInt(v) / 100).toFixed(2);
-  v = v.replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  v = (parseInt(v) / 100).toFixed(2).replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   input.value = "R$ " + v;
 }
 
-// ─── TÍTULO AUTO ─────────────────────────────────────────────────────────────
+// ─── TÍTULO ──────────────────────────────────────────────────────────────────
 function gerarTitulo(card) {
-  const get = name => {
-    const el = card.querySelector(`[name="${name}"]`);
-    return el ? el.value.trim() : "";
-  };
-  const parts = [get("produto"), get("modelo"), get("marca"), get("cor"), get("sexo")]
-    .filter(Boolean).join(" ").substring(0, 60);
-  const tInput = card.querySelector('[name="titulo"]');
-  tInput.value = parts;
-  atualizarContador(tInput);
+  const g = n => { const e = card.querySelector(`[name="${n}"]`); return e ? e.value.trim() : ""; };
+  const t = [g("produto"),g("modelo"),g("marca"),g("cor"),g("sexo")].filter(Boolean).join(" ").substring(0,60);
+  const inp = card.querySelector('[name="titulo"]');
+  inp.value = t;
+  atualizarContador(inp);
 }
-
 function atualizarContador(input) {
-  const counter = input.closest(".titulo-wrap")?.querySelector(".titulo-counter");
-  if (counter) counter.textContent = input.value.length + "/60";
+  const c = input.closest(".titulo-wrap")?.querySelector(".titulo-counter");
+  if (c) c.textContent = input.value.length + "/60";
 }
 
-// ─── REMOVER CARD ────────────────────────────────────────────────────────────
+// ─── NUMERAÇÃO ───────────────────────────────────────────────────────────────
+function atualizarNumeracao() {
+  document.querySelectorAll(".card").forEach((card, i) => {
+    const n = card.querySelector(".card-num");
+    if (n) n.textContent = `Anúncio ${i + 1}`;
+  });
+  document.getElementById("contadorLabel").textContent =
+    document.querySelectorAll(".card").length + " anúncio(s)";
+}
 function removerCard(btn) {
   btn.closest(".card").remove();
   atualizarNumeracao();
 }
 
-function atualizarNumeracao() {
-  document.querySelectorAll(".card").forEach((card, i) => {
-    const num = card.querySelector(".card-num");
-    if (num) num.textContent = `Anúncio ${i + 1}`;
-  });
-  atualizarContadorLabel();
+// ─── BUSCAR ATRIBUTOS OBRIGATÓRIOS DA ML ────────────────────────────────────
+async function carregarAtributosExtras(categoryId, container) {
+  container.style.display = "block";
+  container.innerHTML = `<div class="extra-box-title">⏳ Buscando campos da categoria...</div>`;
+
+  try {
+    if (!attrCache[categoryId]) {
+      const res = await fetch(`https://api.mercadolibre.com/categories/${categoryId}/attributes`);
+      attrCache[categoryId] = await res.json();
+    }
+
+    const attrs = attrCache[categoryId];
+
+    // Somente obrigatórios que não tratamos
+    const extras = attrs.filter(a =>
+      a.tags?.required === true &&
+      !HANDLED.has(a.id)
+    );
+
+    if (extras.length === 0) {
+      container.style.display = "none";
+      container.innerHTML = "";
+      return;
+    }
+
+    container.innerHTML = `<div class="extra-box-title">⚠️ Campos obrigatórios desta categoria (${extras.length})</div>`;
+
+    const row = document.createElement("div");
+    row.className = "field-row";
+
+    extras.forEach(attr => {
+      const field = document.createElement("div");
+      field.className = "field";
+
+      if (attr.allowed_values && attr.allowed_values.length > 0) {
+        field.innerHTML = `
+          <label>${attr.name}</label>
+          <select data-attr-id="${attr.id}" data-attr-name="${attr.name}">
+            <option value="">Selecione</option>
+            ${attr.allowed_values.map(v =>
+              `<option value="${v.id}" data-vname="${v.name}">${v.name}</option>`
+            ).join("")}
+          </select>`;
+      } else {
+        field.innerHTML = `
+          <label>${attr.name}</label>
+          <input data-attr-id="${attr.id}" data-attr-name="${attr.name}"
+            placeholder="Digite ${attr.name}"
+            type="${attr.value_type === 'number' ? 'number' : 'text'}">`;
+      }
+
+      row.appendChild(field);
+    });
+
+    container.appendChild(row);
+
+  } catch (e) {
+    container.innerHTML = `<div style="color:#999;font-size:12px">Não foi possível carregar campos extras (${e.message}).</div>`;
+  }
 }
 
-function atualizarContadorLabel() {
-  const n = document.querySelectorAll(".card").length;
-  document.getElementById("contadorLabel").textContent = `${n} anúncio${n !== 1 ? "s" : ""}`;
+// ─── CATEGORIA MUDOU ─────────────────────────────────────────────────────────
+function onCategoriaChange(select) {
+  const card = select.closest(".card");
+  const box  = card.querySelector(".extra-box");
+  const cat  = select.value;
+  if (cat) carregarAtributosExtras(cat, box);
+  else box.style.display = "none";
 }
 
 // ─── ADD FORM ─────────────────────────────────────────────────────────────────
 function addForm() {
-  cardCount++;
   const div = document.createElement("div");
   div.className = "card";
+  const idx = document.querySelectorAll(".card").length + 1;
 
   div.innerHTML = `
     <div class="card-header">
-      <span class="card-num">Anúncio ${document.querySelectorAll(".card").length + 1}</span>
-      <button class="btn-remove" onclick="removerCard(this)" title="Remover">×</button>
+      <span class="card-num">Anúncio ${idx}</span>
+      <button class="btn-remove" onclick="removerCard(this)">×</button>
     </div>
 
-    <!-- CATEGORIA -->
     <div class="field">
       <label>Categoria</label>
-      <select name="categoria">
+      <select name="categoria" onchange="onCategoriaChange(this)">
         <option value="MLB1430">Vestidos (MLB1430)</option>
         <option value="MLB1196">Blusas e Camisetas Femininas (MLB1196)</option>
         <option value="MLB1292">Calças Femininas (MLB1292)</option>
         <option value="MLB1294">Saias (MLB1294)</option>
         <option value="MLB1435">Macacões e Macaquinhos (MLB1435)</option>
         <option value="MLB1182">Conjuntos Femininos (MLB1182)</option>
+        <option value="MLB1269">Camisas Masculinas (MLB1269)</option>
+        <option value="MLB1273">Calças Masculinas (MLB1273)</option>
       </select>
     </div>
 
-    <!-- IMAGENS -->
+    <!-- CAMPOS EXTRAS DINÂMICOS -->
+    <div class="extra-box" style="display:none"></div>
+
     <div class="field">
       <label>URLs das Imagens</label>
       <div class="field-row">
-        <div class="field"><input name="img1" placeholder="Imagem 1 (obrigatória)" required></div>
+        <div class="field"><input name="img1" placeholder="Imagem 1 (obrigatória)"></div>
         <div class="field"><input name="img2" placeholder="Imagem 2"></div>
         <div class="field"><input name="img3" placeholder="Imagem 3"></div>
         <div class="field"><input name="img4" placeholder="Imagem 4"></div>
       </div>
     </div>
 
-    <!-- DADOS DO PRODUTO -->
     <div class="field-row">
       <div class="field">
         <label>Produto</label>
-        <input name="produto" placeholder="ex: Vestido Midi" required oninput="gerarTitulo(this.closest('.card'))">
+        <input name="produto" placeholder="ex: Vestido Midi" oninput="gerarTitulo(this.closest('.card'))">
       </div>
       <div class="field">
         <label>Modelo</label>
-        <input name="modelo" placeholder="ex: Floral Manga Curta" oninput="gerarTitulo(this.closest('.card'))">
+        <input name="modelo" placeholder="ex: Floral Verão" oninput="gerarTitulo(this.closest('.card'))">
       </div>
       <div class="field">
         <label>Marca</label>
-        <input name="marca" placeholder="ex: Zara" required oninput="gerarTitulo(this.closest('.card'))">
+        <input name="marca" placeholder="ex: Zara" oninput="gerarTitulo(this.closest('.card'))">
       </div>
     </div>
 
     <div class="field-row">
       <div class="field">
         <label>Cor</label>
-        <select name="cor" required onchange="gerarTitulo(this.closest('.card'))">
+        <select name="cor" onchange="gerarTitulo(this.closest('.card'))">
           <option value="">Selecione</option>
-          <option>Preto</option>
-          <option>Branco</option>
-          <option>Vermelho</option>
-          <option>Azul</option>
-          <option>Rosa</option>
-          <option>Verde</option>
-          <option>Amarelo</option>
-          <option>Roxo</option>
-          <option>Laranja</option>
-          <option>Cinza</option>
-          <option>Bege</option>
-          <option>Marrom</option>
-          <option>Vinho</option>
-          <option>Nude</option>
-          <option>Estampado</option>
+          <option>Preto</option><option>Branco</option><option>Vermelho</option>
+          <option>Azul</option><option>Rosa</option><option>Verde</option>
+          <option>Amarelo</option><option>Roxo</option><option>Laranja</option>
+          <option>Cinza</option><option>Bege</option><option>Marrom</option>
+          <option>Vinho</option><option>Nude</option><option>Estampado</option>
           <option>Multicolorido</option>
         </select>
       </div>
       <div class="field">
         <label>Gênero</label>
-        <select name="sexo" required onchange="gerarTitulo(this.closest('.card'))">
+        <select name="sexo" onchange="gerarTitulo(this.closest('.card'))">
           <option value="">Selecione</option>
           <option value="Feminino">Feminino</option>
           <option value="Masculino">Masculino</option>
@@ -351,26 +341,16 @@ function addForm() {
       </div>
       <div class="field">
         <label>Tamanho</label>
-        <select name="tamanho" required>
+        <select name="tamanho">
           <option value="">Selecione</option>
           <optgroup label="Numérico">
-            <option>34</option>
-            <option>36</option>
-            <option>38</option>
-            <option>40</option>
-            <option>42</option>
-            <option>44</option>
-            <option>46</option>
-            <option>48</option>
-            <option>50</option>
+            <option>34</option><option>36</option><option>38</option>
+            <option>40</option><option>42</option><option>44</option>
+            <option>46</option><option>48</option><option>50</option>
           </optgroup>
           <optgroup label="Letras">
-            <option>PP</option>
-            <option>P</option>
-            <option>M</option>
-            <option>G</option>
-            <option>GG</option>
-            <option>XGG</option>
+            <option>PP</option><option>P</option><option>M</option>
+            <option>G</option><option>GG</option><option>XGG</option>
           </optgroup>
           <optgroup label="Único">
             <option>Único</option>
@@ -379,127 +359,158 @@ function addForm() {
       </div>
     </div>
 
-    <!-- TÍTULO (GERADO AUTO) -->
     <div class="field">
       <label>Título do Anúncio (máx. 60 caracteres)</label>
       <div class="titulo-wrap">
-        <input name="titulo" placeholder="Gerado automaticamente ou edite manualmente" maxlength="60" required
-          oninput="atualizarContador(this)">
+        <input name="titulo" placeholder="Gerado automaticamente ou edite" maxlength="60" oninput="atualizarContador(this)">
         <span class="titulo-counter">0/60</span>
       </div>
     </div>
 
-    <!-- DESCRIÇÃO -->
     <div class="field">
       <label>Descrição</label>
       <textarea name="descricao" placeholder="Descrição do produto (opcional)"></textarea>
     </div>
 
-    <!-- PREÇO -->
     <div class="field" style="max-width:220px">
       <label>Preço</label>
-      <input name="preco" placeholder="R$ 0,00" oninput="formatarPreco(this)" required>
+      <input name="preco" placeholder="R$ 0,00" oninput="formatarPreco(this)">
     </div>
   `;
 
   document.getElementById("formArea").appendChild(div);
-  atualizarContadorLabel();
+  atualizarNumeracao();
+
+  // Carregar atributos da categoria padrão
+  const catSelect = div.querySelector('[name="categoria"]');
+  onCategoriaChange(catSelect);
 }
 
-// INICIAR COM 1 FORM
 addForm();
+
+// ─── COLETAR ATRIBUTOS EXTRAS ────────────────────────────────────────────────
+function coletarExtras(card) {
+  const extras = [];
+  card.querySelectorAll("[data-attr-id]").forEach(el => {
+    const id   = el.dataset.attrId;
+    const name = el.dataset.attrName;
+    if (!id) return;
+    if (el.tagName === "SELECT") {
+      const opt = el.options[el.selectedIndex];
+      if (opt && opt.value) extras.push({ id, value_id: opt.value, value_name: opt.dataset.vname || opt.text });
+    } else {
+      if (el.value.trim()) extras.push({ id, value_name: el.value.trim() });
+    }
+  });
+  return extras;
+}
 
 // ─── PUBLICAR ─────────────────────────────────────────────────────────────────
 async function publicar() {
   const btn = document.getElementById("btnPublish");
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Publicando...';
-
-  const resultArea = document.getElementById("resultArea");
-  resultArea.innerHTML = "";
+  document.getElementById("resultArea").innerHTML = "";
 
   const cards = document.querySelectorAll(".card");
   const produtos = [];
-
-  const get = (card, name) => {
-    const el = card.querySelector(`[name="${name}"]`);
-    return el ? el.value.trim() : "";
-  };
+  const get = (card, n) => { const e = card.querySelector(`[name="${n}"]`); return e ? e.value.trim() : ""; };
 
   for (const card of cards) {
-    const title  = get(card, "titulo");
+    const title    = get(card, "titulo");
     const precoRaw = get(card, "preco").replace(/\D/g, "");
-    const preco  = precoRaw ? parseInt(precoRaw) / 100 : 0;
+    const preco    = precoRaw ? parseInt(precoRaw) / 100 : 0;
+    const imagens  = ["img1","img2","img3","img4"].map(n => get(card,n)).filter(Boolean);
 
-    const imagens = [
-      get(card, "img1"),
-      get(card, "img2"),
-      get(card, "img3"),
-      get(card, "img4")
-    ].filter(Boolean);
-
-    if (!title || !preco || imagens.length === 0 || !get(card, "cor") || !get(card, "tamanho") || !get(card, "sexo")) {
-      showAlert("Preencha todos os campos obrigatórios antes de publicar", "error");
-      btn.disabled = false;
-      btn.innerHTML = "Publicar tudo";
+    if (!title || !preco || !imagens.length || !get(card,"cor") || !get(card,"tamanho") || !get(card,"sexo") || !get(card,"marca")) {
+      showAlert("Preencha: título, preço, imagem, cor, tamanho, gênero e marca", "error");
+      btn.disabled = false; btn.innerHTML = "Publicar tudo";
       return;
     }
 
     produtos.push({
       title,
-      description: get(card, "descricao"),
-      category_id: get(card, "categoria"),
-      price:       preco,
-      pictures:    imagens,
-      marca:       get(card, "marca"),
-      modelo:      get(card, "modelo"),
-      cor:         get(card, "cor"),
-      sexo:        get(card, "sexo"),
-      tamanho:     get(card, "tamanho")
+      description:      get(card, "descricao"),
+      category_id:      get(card, "categoria"),
+      price:            preco,
+      pictures:         imagens,
+      marca:            get(card, "marca"),
+      modelo:           get(card, "modelo"),
+      cor:              get(card, "cor"),
+      sexo:             get(card, "sexo"),
+      tamanho:          get(card, "tamanho"),
+      extra_attributes: coletarExtras(card)
     });
   }
 
   try {
-    const res = await fetch("/api/create-items", {
+    const res  = await fetch("/api/create-items", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ produtos, token })
     });
-
     const data = await res.json();
-    console.log("Resultado:", data);
+    console.log("ML Response:", data);
+    renderResultados(data);
 
-    // RENDERIZAR RESULTADOS
-    const hasErr = data.some(r => r.erro);
-    const header = document.createElement("div");
-    header.className = "result-header";
-    header.textContent = hasErr
-      ? `⚠️ Publicação concluída com erros (${data.filter(r=>r.erro).length} falha(s))`
-      : `✅ ${data.length} anúncio(s) publicado(s) com sucesso!`;
-    resultArea.appendChild(header);
-
-    data.forEach(r => {
-      const row = document.createElement("div");
-      row.className = `result-row ${r.sucesso ? "result-ok" : "result-err"}`;
-      row.innerHTML = r.sucesso
-        ? `<span>✔</span> <b>${r.produto}</b> — ID: ${r.id}
-           ${r.link ? `<a class="result-link" href="${r.link}" target="_blank">Ver anúncio ↗</a>` : ""}`
-        : `<span>✖</span> <b>${r.produto}</b> — ${typeof r.detalhe === "object" ? (r.detalhe.message || JSON.stringify(r.detalhe)) : r.detalhe}`;
-      resultArea.appendChild(row);
-    });
-
-    resultArea.scrollIntoView({ behavior: "smooth" });
-
-    if (!hasErr) showAlert(`${data.length} anúncio(s) publicado(s)!`, "success");
-    else          showAlert("Verifique os erros acima", "error");
+    const erros = data.filter(r => r.erro).length;
+    if (!erros) showAlert(`✅ ${data.length} anúncio(s) publicado(s)!`, "success");
+    else        showAlert(`⚠️ ${erros} erro(s) — veja detalhes acima`, "error");
 
   } catch (err) {
     showAlert("Erro de conexão: " + err.message, "error");
-    console.error(err);
   }
 
-  btn.disabled = false;
-  btn.innerHTML = "Publicar tudo";
+  btn.disabled = false; btn.innerHTML = "Publicar tudo";
+}
+
+// ─── RENDERIZAR RESULTADOS ────────────────────────────────────────────────────
+function renderResultados(data) {
+  const area = document.getElementById("resultArea");
+  area.innerHTML = "";
+
+  const erros = data.filter(r => r.erro).length;
+  const h = document.createElement("div");
+  h.className = "result-header";
+  h.textContent = erros === 0
+    ? `✅ ${data.length} anúncio(s) publicado(s) com sucesso!`
+    : `⚠️ Publicação concluída com ${erros} falha(s)`;
+  area.appendChild(h);
+
+  data.forEach(r => {
+    const row = document.createElement("div");
+    row.className = `result-row ${r.sucesso ? "result-ok" : "result-err"}`;
+
+    if (r.sucesso) {
+      row.innerHTML = `
+        <span>✔</span>
+        <div>
+          <b>${r.produto}</b> — ID: ${r.id}
+          ${r.link ? `<br><a class="result-link" href="${r.link}" target="_blank">Ver anúncio ↗</a>` : ""}
+        </div>`;
+    } else {
+      let detalhe = "";
+      if (r.detalhe && typeof r.detalhe === "object") {
+        // Mostrar cause da ML que diz exatamente qual campo falta
+        if (Array.isArray(r.detalhe.cause) && r.detalhe.cause.length > 0) {
+          detalhe = r.detalhe.cause.map(c => `• ${c.message || c.code || JSON.stringify(c)}`).join("<br>");
+        } else {
+          detalhe = r.detalhe.message || JSON.stringify(r.detalhe, null, 2);
+        }
+      } else {
+        detalhe = String(r.detalhe || "");
+      }
+      row.innerHTML = `
+        <span>✖</span>
+        <div style="flex:1">
+          <b>${r.produto}</b>
+          <div class="result-cause">${detalhe}</div>
+        </div>`;
+    }
+    area.appendChild(row);
+  });
+
+  area.scrollIntoView({ behavior: "smooth" });
 }
 </script>
 </body>
