@@ -37,12 +37,12 @@ label{display:block;font-size:11px;font-weight:600;color:#555;margin-bottom:5px;
   padding:1px 5px;margin-left:4px;text-transform:lowercase;letter-spacing:0}
 .req{color:#e03030;margin-left:2px}
 
-input,textarea,select{padding:10px 12px;border:1px solid #ddd;border-radius:6px;width:100%;
-  font-size:14px;font-family:'Inter';transition:border-color .2s;background:#fafafa;color:#333}
+input,textarea,select{padding:10px 12px;border:1px solid #ddd;border-radius:6px;
+  width:100%;font-size:14px;font-family:'Inter';transition:border-color .2s;
+  background:#fafafa;color:#333}
 input:focus,textarea:focus,select:focus{border-color:#3483fa;outline:none;background:white}
 textarea{height:80px;resize:vertical}
 
-/* TOGGLE */
 .tg-group{display:flex;gap:8px;flex-wrap:wrap}
 .tg-opt{flex:1;min-width:100px;border:2px solid #ddd;border-radius:8px;
   padding:11px 10px;cursor:pointer;transition:all .18s;text-align:center}
@@ -53,8 +53,7 @@ textarea{height:80px;resize:vertical}
 .tg-title{font-size:13px;font-weight:700;color:#333}
 .tg-sub{font-size:10px;color:#888;margin-top:2px}
 
-/* SWITCH */
-.sw-row{display:flex;align-items:center;gap:10px;cursor:pointer;margin-top:6px}
+.sw-row{display:flex;align-items:center;gap:10px;cursor:pointer;margin-top:8px}
 .sw{position:relative;width:42px;height:24px}
 .sw input{opacity:0;width:0;height:0}
 .sl{position:absolute;inset:0;background:#ccc;border-radius:24px;transition:.3s}
@@ -64,18 +63,15 @@ textarea{height:80px;resize:vertical}
 .sw input:checked+.sl::before{transform:translateX(18px)}
 .sw-lbl{font-size:13px;color:#444;font-weight:500}
 
-/* CHIPS */
 .chip-group{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
 .chip{padding:5px 12px;border:1.5px solid #ddd;border-radius:20px;font-size:12px;
   cursor:pointer;color:#555;background:#fafafa;transition:all .15s;user-select:none}
 .chip:hover{border-color:#3483fa;color:#3483fa}
 .chip.on{border-color:#3483fa;background:#3483fa;color:white}
 
-/* TÍTULO */
 .tw{position:relative}
 .tc{position:absolute;right:10px;top:10px;font-size:11px;color:#aaa;pointer-events:none}
 
-/* RESULT */
 .rh{font-size:15px;font-weight:700;color:#333;margin-bottom:12px}
 .rr{display:flex;align-items:flex-start;gap:10px;padding:12px 16px;border-radius:6px;
   margin-bottom:6px;font-size:13px}
@@ -85,10 +81,9 @@ textarea{height:80px;resize:vertical}
 .rl{font-size:11px;color:#3483fa}
 .dbg{background:#1a1a2e;color:#e0e0e0;font-family:monospace;font-size:11px;
   border-radius:6px;padding:12px 14px;margin-top:8px;white-space:pre-wrap;
-  word-break:break-all;max-height:200px;overflow-y:auto;display:none}
+  word-break:break-all;max-height:220px;overflow-y:auto;display:none}
 .dt{font-size:10px;color:#3483fa;cursor:pointer;margin-top:4px;display:inline-block}
 
-/* BOTÃO */
 .btn-bar{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #e0e0e0;
   padding:12px 30px;display:flex;gap:10px;justify-content:center;z-index:200}
 button{padding:12px 24px;border:none;border-radius:6px;font-weight:600;cursor:pointer;
@@ -103,14 +98,12 @@ button:active{transform:scale(.98)}
   border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;
   vertical-align:middle;margin-right:6px}
 @keyframes spin{to{transform:rotate(360deg)}}
-
 .al{position:fixed;top:20px;left:50%;transform:translateX(-50%);
   padding:14px 28px;border-radius:8px;font-weight:600;color:white;z-index:999;
   box-shadow:0 4px 20px rgba(0,0,0,.25);animation:fo 5s forwards}
 .al.ok{background:#00a650}
 .al.er{background:#e03030}
 @keyframes fo{0%,75%{opacity:1}100%{opacity:0}}
-
 #resultArea{margin-bottom:20px}
 </style>
 </head>
@@ -133,131 +126,150 @@ button:active{transform:scale(.98)}
 </div>
 
 <script>
+// Token vem da URL após autenticação OAuth
 const token = new URLSearchParams(window.location.search).get("token");
 
-/* ── LISTAS ──────────────────────────────────────────────────────────── */
-const OCASIOES  = ["Aniversário","Calor","Casamento","Casual","Festa","Igreja","Shopping","Verão","Gestante","Trabalho","Formatura","Praia"];
-const ESTILOS   = ["Elegante","Casual","Romântico","Moderno","Clássico","Boho","Esportivo"];
-const MATERIAIS = ["Viscolinho","Viscose","Algodão","Linho","Poliéster","Malha","Crepe","Cetim","Renda","Duna","Oxford","Jeans"];
-const COMPRIM   = ["Curto","Midi","Longo","Mini","Maxi"];
-const MANGAS    = ["Sem manga","Alças finas","Ombro a ombro","Meia manga","Manga curta","Manga 3/4","Manga longa"];
-const GOLAS     = ["Decote V","Quadrado","Redondo","Canoa","Assimétrico","Tomara que caia","Frente única","Laço"];
-const TIPOS_V   = ["Solto","Justo","Evasê","Envelope","Tubinho","Chemise","Wrap"];
-const TEMP      = ["Primavera/Verão","Outono/Inverno","Todas as estações"];
-const IDADES    = ["Adultos","Jovem adulto","Criança"];
+/* ── LISTAS ─────────────────────────────────────────────────────── */
+const MATERIAIS  = ["Viscolinho","Viscose","Algodão","Linho","Poliéster","Malha","Crepe","Cetim","Renda","Duna","Oxford","Jeans"];
+const COMPRIM    = ["Curto","Midi","Longo","Mini","Maxi"];
+const MANGAS     = ["Sem manga","Alças finas","Ombro a ombro","Meia manga","Manga curta","Manga 3/4","Manga longa"];
+const GOLAS      = ["Decote V","Quadrado","Redondo","Canoa","Assimétrico","Tomara que caia","Frente única","Laço"];
+const TIPOS_V    = ["Solto","Justo","Evasê","Envelope","Tubinho","Chemise","Wrap"];
+const TEMP       = ["Primavera/Verão","Outono/Inverno","Todas as estações"];
+const IDADES     = ["Adultos","Jovem adulto","Criança"];
+const OCASIOES   = ["Aniversário","Calor","Casamento","Casual","Festa","Igreja","Shopping","Verão","Gestante","Trabalho","Formatura","Praia"];
+const ESTILOS    = ["Elegante","Casual","Romântico","Moderno","Clássico","Boho","Esportivo"];
 
-/* ── TRADUÇÃO ERROS ML ───────────────────────────────────────────────── */
+/* ── TRADUÇÃO DE ERROS ──────────────────────────────────────────── */
 const TRAD = {
-  "family_name":                     "Campo 'family_name' obrigatório na raiz",
-  "price":                           "Preço ausente dentro de variations",
-  "available_quantity":              "Quantidade ausente dentro de variations",
-  "attribute_combinations":          "Cor/Tamanho ausentes em variations",
-  "The field variations is invalid": "Variations inválido — family_name ausente",
-  "The body does not contains":      "Body sem campo(s) obrigatório(s)",
-  "item variation with errors":      "Variação com erros",
-  "invalid_body":                    "Body da requisição inválido",
-  "missing_field":                   "Campo obrigatório ausente",
-  "invalid_field":                   "Campo com valor inválido",
-  "unauthorized":                    "Token inválido ou expirado — reconecte",
-  "invalid pictures":                "URL de imagem inválida",
-  "The resource is not reachable":   "Imagem inacessível — verifique o link",
-  "listing_type":                    "Tipo de anúncio inválido",
-  "cannot post item":                "Sem permissão para publicar nesta categoria"
+  "family_name":                          "Campo 'family_name' ausente — erro interno",
+  "price":                                "Preço inválido ou ausente",
+  "available_quantity":                   "Quantidade inválida ou ausente",
+  "attribute_combinations":               "Cor ou tamanho não informados",
+  "variations is invalid":                "Estrutura de variações inválida",
+  "The body does not contains":           "Campo(s) obrigatório(s) ausente(s)",
+  "item variation with errors":           "Variação do item com erros",
+  "invalid_body":                         "Body da requisição inválido",
+  "missing_field":                        "Campo obrigatório ausente",
+  "invalid_field":                        "Campo com valor inválido",
+  "unauthorized":                         "Token inválido ou expirado — reconecte",
+  "Forbidden":                            "Sem permissão — verifique o token",
+  "invalid pictures":                     "URL de imagem inválida",
+  "The resource is not reachable":        "Imagem inacessível — verifique o link",
+  "listing_type":                         "Tipo de anúncio inválido",
+  "cannot post item":                     "Sem permissão para publicar nesta categoria",
+  "item.buying_mode":                     "Modo de compra inválido",
+  "warranty":                             "Garantia com formato inválido"
 };
-function traduzir(txt){
-  if(!txt) return txt;
-  for(const[en,pt] of Object.entries(TRAD)) if(txt.toLowerCase().includes(en.toLowerCase())) return pt;
+
+function traduzir(txt) {
+  if (!txt) return "Erro desconhecido";
+  for (const [en, pt] of Object.entries(TRAD)) {
+    if (txt.toLowerCase().includes(en.toLowerCase())) return pt;
+  }
   return txt;
 }
 
-/* ── UTILS ───────────────────────────────────────────────────────────── */
-function showAlert(msg,type="ok"){
-  document.querySelectorAll(".al").forEach(a=>a.remove());
-  const d=document.createElement("div");
-  d.className=`al ${type}`;d.innerText=msg;
-  document.body.appendChild(d);setTimeout(()=>d.remove(),5000);
-}
-function fmtPreco(inp){
-  let v=inp.value.replace(/\D/g,"");
-  if(!v){inp.value="";return}
-  v=(parseInt(v)/100).toFixed(2).replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g,".");
-  inp.value="R$ "+v;
-}
-function gerarTitulo(card){
-  const g=n=>{const e=card.querySelector(`[name="${n}"]`);return e?e.value.trim():""};
-  const t=[g("produto"),g("modelo"),g("marca"),g("cor"),g("sexo")].filter(Boolean).join(" ").substring(0,60);
-  const inp=card.querySelector('[name="titulo"]');inp.value=t;updCount(inp);
-}
-function updCount(inp){
-  const c=inp.closest(".tw")?.querySelector(".tc");if(c)c.textContent=inp.value.length+"/60";
-}
-function updN(){
-  document.querySelectorAll(".card").forEach((c,i)=>{const n=c.querySelector(".card-num");if(n)n.textContent=`Anúncio ${i+1}`});
-  document.getElementById("cLabel").textContent=document.querySelectorAll(".card").length+" anúncio(s)";
-}
-function rmCard(btn){btn.closest(".card").remove();updN()}
-
-/* ── CHIPS ───────────────────────────────────────────────────────────── */
-function buildChips(wrap,items,name){
-  wrap.innerHTML=`<div class="chip-group" data-name="${name}">`+
-    items.map(i=>`<div class="chip" data-value="${i}" onclick="this.classList.toggle('on')">${i}</div>`).join("")+`</div>`;
-}
-function getChips(card,name){
-  const g=card.querySelector(`.chip-group[data-name="${name}"]`);
-  return g?[...g.querySelectorAll(".chip.on")].map(c=>c.dataset.value):[];
+/* ── UTILS ──────────────────────────────────────────────────────── */
+function showAlert(msg, type="ok") {
+  document.querySelectorAll(".al").forEach(a => a.remove());
+  const d = document.createElement("div");
+  d.className = `al ${type}`; d.innerText = msg;
+  document.body.appendChild(d);
+  setTimeout(() => d.remove(), 5000);
 }
 
-/* ── TOGGLE ──────────────────────────────────────────────────────────── */
-function selToggle(card,name,value,cls){
-  const grp=card.querySelector(`.tg-group[data-name="${name}"]`);
-  if(!grp)return;
-  grp.querySelectorAll(".tg-opt").forEach(o=>o.className="tg-opt");
-  const opt=grp.querySelector(`[data-value="${value}"]`);
-  if(opt)opt.classList.add(cls);
-  card.querySelector(`[name="${name}"]`).value=value;
+function fmtPreco(inp) {
+  let v = inp.value.replace(/\D/g, "");
+  if (!v) { inp.value = ""; return; }
+  v = (parseInt(v, 10) / 100).toFixed(2)
+      .replace(".", ",")
+      .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  inp.value = "R$ " + v;
 }
 
-/* ── ADD FORM ─────────────────────────────────────────────────────────── */
-function addForm(){
-  const div=document.createElement("div");
-  div.className="card";
-  const idx=document.querySelectorAll(".card").length+1;
+function gerarTitulo(card) {
+  const g = n => { const e = card.querySelector(`[name="${n}"]`); return e ? e.value.trim() : ""; };
+  const t = [g("produto"),g("modelo"),g("marca"),g("cor"),g("sexo")]
+    .filter(Boolean).join(" ").substring(0, 60);
+  const inp = card.querySelector('[name="titulo"]');
+  inp.value = t; updCount(inp);
+}
+function updCount(inp) {
+  const c = inp.closest(".tw")?.querySelector(".tc");
+  if (c) c.textContent = inp.value.length + "/60";
+}
 
-  div.innerHTML=`
+function updN() {
+  document.querySelectorAll(".card").forEach((c, i) => {
+    const n = c.querySelector(".card-num"); if (n) n.textContent = `Anúncio ${i+1}`;
+  });
+  document.getElementById("cLabel").textContent =
+    document.querySelectorAll(".card").length + " anúncio(s)";
+}
+function rmCard(btn) { btn.closest(".card").remove(); updN(); }
+
+function buildChips(wrap, items, name) {
+  wrap.innerHTML = `<div class="chip-group" data-name="${name}">` +
+    items.map(i => `<div class="chip" data-value="${i}" onclick="this.classList.toggle('on')">${i}</div>`).join("") +
+    `</div>`;
+}
+function getChips(card, name) {
+  const g = card.querySelector(`.chip-group[data-name="${name}"]`);
+  return g ? [...g.querySelectorAll(".chip.on")].map(c => c.dataset.value) : [];
+}
+
+function selToggle(card, name, value, cls) {
+  const grp = card.querySelector(`.tg-group[data-name="${name}"]`);
+  if (!grp) return;
+  grp.querySelectorAll(".tg-opt").forEach(o => o.className = "tg-opt");
+  const opt = grp.querySelector(`[data-value="${value}"]`);
+  if (opt) opt.classList.add(cls);
+  card.querySelector(`[name="${name}"]`).value = value;
+}
+
+/* ── ADD FORM ────────────────────────────────────────────────────── */
+function addForm() {
+  const div = document.createElement("div");
+  div.className = "card";
+  const idx = document.querySelectorAll(".card").length + 1;
+
+  div.innerHTML = `
   <div class="card-header">
     <span class="card-num">Anúncio ${idx}</span>
     <button class="btn-rm" onclick="rmCard(this)">×</button>
   </div>
 
-  <!-- TIPO DE ANÚNCIO -->
   <div class="sec">
     <div class="sec-title">📋 Tipo de anúncio</div>
     <input type="hidden" name="listing_type" value="gold_special">
     <div class="tg-group" data-name="listing_type">
-      <div class="tg-opt blue" data-value="gold_special" onclick="selToggle(this.closest('.card'),'listing_type','gold_special','blue')">
+      <div class="tg-opt blue" data-value="gold_special"
+        onclick="selToggle(this.closest('.card'),'listing_type','gold_special','blue')">
         <div class="tg-title">🥈 Clássico</div><div class="tg-sub">gold_special</div>
       </div>
-      <div class="tg-opt" data-value="gold_pro" onclick="selToggle(this.closest('.card'),'listing_type','gold_pro','green')">
+      <div class="tg-opt" data-value="gold_pro"
+        onclick="selToggle(this.closest('.card'),'listing_type','gold_pro','green')">
         <div class="tg-title">🥇 Premium</div><div class="tg-sub">gold_pro</div>
       </div>
     </div>
   </div>
 
-  <!-- CONDIÇÃO -->
   <div class="sec">
     <div class="sec-title">🔖 Condição</div>
     <input type="hidden" name="condition" value="new">
     <div class="tg-group" data-name="condition">
-      <div class="tg-opt blue" data-value="new" onclick="selToggle(this.closest('.card'),'condition','new','blue')">
+      <div class="tg-opt blue" data-value="new"
+        onclick="selToggle(this.closest('.card'),'condition','new','blue')">
         <div class="tg-title">✨ Novo</div><div class="tg-sub">Produto novo</div>
       </div>
-      <div class="tg-opt" data-value="used" onclick="selToggle(this.closest('.card'),'condition','used','orange')">
+      <div class="tg-opt" data-value="used"
+        onclick="selToggle(this.closest('.card'),'condition','used','orange')">
         <div class="tg-title">♻️ Usado</div><div class="tg-sub">Produto usado</div>
       </div>
     </div>
   </div>
 
-  <!-- CATEGORIA -->
   <div class="sec">
     <div class="sec-title">🏷️ Categoria</div>
     <select name="categoria">
@@ -272,7 +284,6 @@ function addForm(){
     </select>
   </div>
 
-  <!-- IMAGENS -->
   <div class="sec">
     <div class="sec-title">🖼️ Imagens</div>
     <div class="row">
@@ -283,13 +294,15 @@ function addForm(){
     </div>
   </div>
 
-  <!-- DADOS PRINCIPAIS -->
   <div class="sec">
     <div class="sec-title">👗 Dados do produto</div>
     <div class="row">
-      <div class="f"><label>Produto <span class="req">*</span></label><input name="produto" placeholder="ex: Vestido" oninput="gerarTitulo(this.closest('.card'))"></div>
-      <div class="f"><label>Modelo <span class="opt">opcional</span></label><input name="modelo" placeholder="ex: Floral Longo" oninput="gerarTitulo(this.closest('.card'))"></div>
-      <div class="f"><label>Marca <span class="req">*</span></label><input name="marca" placeholder="ex: Zara" oninput="gerarTitulo(this.closest('.card'))"></div>
+      <div class="f"><label>Produto <span class="req">*</span></label>
+        <input name="produto" placeholder="ex: Vestido" oninput="gerarTitulo(this.closest('.card'))"></div>
+      <div class="f"><label>Modelo <span class="opt">opcional</span></label>
+        <input name="modelo" placeholder="ex: Floral Longo" oninput="gerarTitulo(this.closest('.card'))"></div>
+      <div class="f"><label>Marca <span class="req">*</span></label>
+        <input name="marca" placeholder="ex: Zara" oninput="gerarTitulo(this.closest('.card'))"></div>
     </div>
     <div class="row">
       <div class="f">
@@ -317,36 +330,50 @@ function addForm(){
         <label>Tamanho <span class="req">*</span></label>
         <select name="tamanho">
           <option value="">Selecione</option>
-          <optgroup label="Numérico"><option>34</option><option>36</option><option>38</option><option>40</option><option>42</option><option>44</option><option>46</option><option>48</option><option>50</option></optgroup>
-          <optgroup label="Letras"><option>PP</option><option>P</option><option>M</option><option>G</option><option>GG</option><option>XGG</option></optgroup>
+          <optgroup label="Numérico">
+            <option>34</option><option>36</option><option>38</option>
+            <option>40</option><option>42</option><option>44</option>
+            <option>46</option><option>48</option><option>50</option>
+          </optgroup>
+          <optgroup label="Letras">
+            <option>PP</option><option>P</option><option>M</option>
+            <option>G</option><option>GG</option><option>XGG</option>
+          </optgroup>
           <option>Único</option>
         </select>
       </div>
     </div>
   </div>
 
-  <!-- CARACTERÍSTICAS VESTIDO -->
   <div class="sec">
     <div class="sec-title">✨ Características <span class="opt" style="font-size:9px">todos opcionais</span></div>
     <div class="row">
-      <div class="f"><label>Material</label><select name="material"><option value="">Selecione</option>${MATERIAIS.map(m=>`<option>${m}</option>`).join("")}</select></div>
-      <div class="f"><label>Comprimento</label><select name="tipo_comprimento"><option value="">Selecione</option>${COMPRIM.map(m=>`<option>${m}</option>`).join("")}</select></div>
-      <div class="f"><label>Tipo de manga</label><select name="tipo_manga"><option value="">Selecione</option>${MANGAS.map(m=>`<option>${m}</option>`).join("")}</select></div>
+      <div class="f"><label>Material</label>
+        <select name="material"><option value="">Selecione</option>${MATERIAIS.map(m=>`<option>${m}</option>`).join("")}</select></div>
+      <div class="f"><label>Comprimento</label>
+        <select name="comprimento"><option value="">Selecione</option>${COMPRIM.map(m=>`<option>${m}</option>`).join("")}</select></div>
+      <div class="f"><label>Tipo de manga</label>
+        <select name="manga"><option value="">Selecione</option>${MANGAS.map(m=>`<option>${m}</option>`).join("")}</select></div>
     </div>
     <div class="row">
-      <div class="f"><label>Tipo de gola</label><select name="tipo_gola"><option value="">Selecione</option>${GOLAS.map(m=>`<option>${m}</option>`).join("")}</select></div>
-      <div class="f"><label>Tipo de vestido</label><select name="tipo_vestido"><option value="">Selecione</option>${TIPOS_V.map(m=>`<option>${m}</option>`).join("")}</select></div>
-      <div class="f"><label>Temporada</label><select name="temporada"><option value="">Selecione</option>${TEMP.map(m=>`<option>${m}</option>`).join("")}</select></div>
+      <div class="f"><label>Tipo de gola</label>
+        <select name="gola"><option value="">Selecione</option>${GOLAS.map(m=>`<option>${m}</option>`).join("")}</select></div>
+      <div class="f"><label>Tipo de vestido</label>
+        <select name="tipo_vestido"><option value="">Selecione</option>${TIPOS_V.map(m=>`<option>${m}</option>`).join("")}</select></div>
+      <div class="f"><label>Temporada</label>
+        <select name="temporada"><option value="">Selecione</option>${TEMP.map(m=>`<option>${m}</option>`).join("")}</select></div>
     </div>
     <div class="row">
-      <div class="f"><label>Faixa etária</label><select name="faixa_etaria"><option value="">Selecione</option>${IDADES.map(m=>`<option>${m}</option>`).join("")}</select></div>
-      <div class="f"><label>Apto gestante</label><select name="gestante"><option value="">Selecione</option><option value="Sim">Sim</option><option value="Não">Não</option></select></div>
+      <div class="f"><label>Faixa etária</label>
+        <select name="faixa_etaria"><option value="">Selecione</option>${IDADES.map(m=>`<option>${m}</option>`).join("")}</select></div>
+      <div class="f"><label>Apto gestante</label>
+        <select name="gestante"><option value="">Selecione</option>
+          <option value="Sim">Sim</option><option value="Não">Não</option></select></div>
     </div>
     <div class="f"><label>Ocasiões</label><div id="oc-${idx}"></div></div>
     <div class="f"><label>Estilos</label><div id="es-${idx}"></div></div>
   </div>
 
-  <!-- TÍTULO E DESCRIÇÃO -->
   <div class="sec">
     <div class="sec-title">📝 Título e descrição</div>
     <div class="f">
@@ -362,14 +389,17 @@ function addForm(){
     </div>
   </div>
 
-  <!-- PREÇO, ESTOQUE, FRETE, SKU, GARANTIA -->
   <div class="sec">
     <div class="sec-title">💰 Preço e estoque</div>
     <div class="row">
-      <div class="f"><label>Preço <span class="req">*</span></label><input name="preco" placeholder="R$ 0,00" oninput="fmtPreco(this)"></div>
-      <div class="f"><label>Estoque <span class="req">*</span></label><input name="quantidade" type="number" min="1" value="10"></div>
-      <div class="f"><label>SKU <span class="opt">opcional</span></label><input name="sku" placeholder="Código interno"></div>
-      <div class="f"><label>Garantia <span class="opt">opcional</span></label><input name="garantia" placeholder="ex: 30 dias"></div>
+      <div class="f"><label>Preço <span class="req">*</span></label>
+        <input name="preco" placeholder="R$ 0,00" oninput="fmtPreco(this)"></div>
+      <div class="f"><label>Estoque <span class="req">*</span></label>
+        <input name="quantidade" type="number" min="1" value="10"></div>
+      <div class="f"><label>SKU <span class="opt">opcional</span></label>
+        <input name="sku" placeholder="Código interno"></div>
+      <div class="f"><label>Garantia <span class="opt">opcional</span></label>
+        <input name="garantia" placeholder="ex: 30 dias"></div>
     </div>
     <label class="sw-row">
       <span class="sw"><input type="checkbox" name="frete_gratis"><span class="sl"></span></span>
@@ -377,7 +407,6 @@ function addForm(){
     </label>
   </div>
 
-  <!-- DIMENSÕES -->
   <div class="sec">
     <div class="sec-title">📦 Dimensões e peso <span class="opt" style="font-size:9px">todos opcionais</span></div>
     <div class="row">
@@ -397,135 +426,254 @@ function addForm(){
 
 addForm();
 
-/* ── EXTRAS ──────────────────────────────────────────────────────────── */
-function montarExtras(card){
-  const g=n=>{const e=card.querySelector(`[name="${n}"]`);return e?e.value.trim():""};
-  const extras=[];
-  const maybe=(id,val)=>{if(val)extras.push({id,value_name:val})};
-  maybe("MAIN_MATERIAL",   g("material"));
-  maybe("LENGTH_TYPE",     g("tipo_comprimento"));
-  maybe("SLEEVE_TYPE",     g("tipo_manga"));
-  maybe("COLLAR_TYPE",     g("tipo_gola"));
-  maybe("DRESS_TYPE",      g("tipo_vestido"));
-  maybe("LAUNCH_SEASON",   g("temporada"));
-  maybe("AGE_GROUP",       g("faixa_etaria"));
-  maybe("IS_FOR_PREGNANT", g("gestante"));
-  const oc=getChips(card,"ocasioes");if(oc.length)extras.push({id:"OCCASION",value_name:oc.join(", ")});
-  const es=getChips(card,"estilos");if(es.length)extras.push({id:"STYLE",value_name:es.join(", ")});
-  return extras;
-}
+/* ── MONTAR BODY DA ML ──────────────────────────────────────────── */
+function montarBody(card) {
+  const g = n => { const e = card.querySelector(`[name="${n}"]`); return e ? e.value.trim() : ""; };
 
-/* ── PUBLICAR ────────────────────────────────────────────────────────── */
-async function publicar(){
-  const btn=document.getElementById("btnPub");
-  btn.disabled=true;btn.innerHTML='<span class="sp"></span> Publicando...';
-  document.getElementById("resultArea").innerHTML="";
+  // Preço: "R$ 1.111,11" → 1111.11
+  const precoRaw = g("preco").replace(/\D/g, "");
+  const preco = precoRaw ? parseInt(precoRaw, 10) / 100 : 0;
 
-  const cards=document.querySelectorAll(".card");
-  const produtos=[];
-  const get=(card,n)=>{const e=card.querySelector(`[name="${n}"]`);return e?e.value.trim():""};
+  const qtd = parseInt(g("quantidade"), 10) || 10;
 
-  for(const card of cards){
-    const title    = get(card,"titulo");
-    const precoRaw = get(card,"preco").replace(/\D/g,"");
-    const preco    = precoRaw?parseInt(precoRaw)/100:0;
-    const imagens  = ["img1","img2","img3","img4"].map(n=>get(card,n)).filter(Boolean);
-    const qtd      = parseInt(get(card,"quantidade"))||10;
-    const freteEl  = card.querySelector('[name="frete_gratis"]');
+  const pictures = ["img1","img2","img3","img4"]
+    .map(n => g(n))
+    .filter(u => u && u.startsWith("http"))
+    .map(u => ({ source: u }));
 
-    if(!title)         {showAlert("Preencha o título","er");btn.disabled=false;btn.innerHTML="Publicar tudo";return}
-    if(!preco)         {showAlert("Preencha o preço","er");btn.disabled=false;btn.innerHTML="Publicar tudo";return}
-    if(!imagens.length){showAlert("Adicione ao menos 1 imagem","er");btn.disabled=false;btn.innerHTML="Publicar tudo";return}
-    if(!get(card,"marca"))   {showAlert("Preencha a marca","er");btn.disabled=false;btn.innerHTML="Publicar tudo";return}
-    if(!get(card,"cor"))     {showAlert("Selecione a cor","er");btn.disabled=false;btn.innerHTML="Publicar tudo";return}
-    if(!get(card,"tamanho")) {showAlert("Selecione o tamanho","er");btn.disabled=false;btn.innerHTML="Publicar tudo";return}
-    if(!get(card,"sexo"))    {showAlert("Selecione o gênero","er");btn.disabled=false;btn.innerHTML="Publicar tudo";return}
+  // Atributos
+  const attributes = [];
+  const addAttr = (id, val) => { if (val) attributes.push({ id, value_name: String(val) }); };
 
-    produtos.push({
-      title,
-      description:     get(card,"descricao"),
-      category_id:     get(card,"categoria"),
-      listing_type:    get(card,"listing_type")||"gold_special",
-      condition:       get(card,"condition")||"new",
-      price:           preco,
-      quantidade:      qtd,
-      frete_gratis:    freteEl?freteEl.checked:false,
-      pictures:        imagens,
-      marca:           get(card,"marca"),
-      modelo:          get(card,"modelo"),
-      cor:             get(card,"cor"),
-      sexo:            get(card,"sexo"),
-      tamanho:         get(card,"tamanho"),
-      sku:             get(card,"sku"),
-      garantia:        get(card,"garantia"),
-      peso_kg:         get(card,"peso_kg"),
-      largura_cm:      get(card,"largura_cm"),
-      altura_cm:       get(card,"altura_cm"),
-      profundidade_cm: get(card,"profundidade_cm"),
-      extra_attributes:montarExtras(card)
-    });
+  addAttr("BRAND",          g("marca"));
+  addAttr("GENDER",         g("sexo"));
+  addAttr("MODEL",          g("modelo"));
+  addAttr("COLOR",          g("cor"));
+  addAttr("SIZE",           g("tamanho"));
+  addAttr("MAIN_MATERIAL",  g("material"));
+  addAttr("LENGTH_TYPE",    g("comprimento"));
+  addAttr("SLEEVE_TYPE",    g("manga"));
+  addAttr("COLLAR_TYPE",    g("gola"));
+  addAttr("DRESS_TYPE",     g("tipo_vestido"));
+  addAttr("LAUNCH_SEASON",  g("temporada"));
+  addAttr("AGE_GROUP",      g("faixa_etaria"));
+  addAttr("IS_FOR_PREGNANT",g("gestante"));
+
+  const oc = getChips(card, "ocasioes");
+  if (oc.length) addAttr("OCCASION", oc.join(", "));
+  const es = getChips(card, "estilos");
+  if (es.length) addAttr("STYLE", es.join(", "));
+
+  const freteEl = card.querySelector('[name="frete_gratis"]');
+
+  // Shipping
+  const shipping = {
+    mode: "me2",
+    free_shipping: freteEl ? freteEl.checked : false
+  };
+
+  const peso    = parseFloat(g("peso_kg"));
+  const largura = parseFloat(g("largura_cm"));
+  const altura  = parseFloat(g("altura_cm"));
+  const prof    = parseFloat(g("profundidade_cm"));
+  if (peso && largura && altura && prof) {
+    shipping.dimensions = {
+      width:  { value: largura, unit: "cm" },
+      height: { value: altura,  unit: "cm" },
+      length: { value: prof,    unit: "cm" }
+    };
   }
 
-  try{
-    const res  = await fetch("/api/create-items",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({produtos,token})});
-    const data = await res.json();
-    console.log("ML Response:",data);
-    renderR(data);
-    const errs=data.filter(r=>r.erro).length;
-    if(!errs) showAlert(`✅ ${data.length} anúncio(s) publicado(s) com sucesso!`,"ok");
-    else      showAlert(`⚠️ ${errs} erro(s) — veja detalhes acima`,"er");
-  }catch(err){
-    showAlert("Erro de conexão: "+err.message,"er");
-  }
-  btn.disabled=false;btn.innerHTML="Publicar tudo";
+  const titulo = g("titulo");
+
+  // ══════════════════════════════════════════════════════════════════
+  // BODY FINAL — estrutura correta para ML com variations obrigatório
+  // family_name → raiz
+  // price + available_quantity → dentro de cada variation
+  // ══════════════════════════════════════════════════════════════════
+  const body = {
+    title:            titulo,
+    category_id:      g("categoria"),
+    currency_id:      "BRL",
+    buying_mode:      "buy_it_now",
+    listing_type_id:  g("listing_type") || "gold_special",
+    condition:        g("condition")    || "new",
+    pictures,
+    shipping,
+    attributes,
+
+    // Obrigatório na raiz quando há variations
+    family_name: titulo,
+
+    // price e available_quantity DENTRO de variations
+    variations: [
+      {
+        attribute_combinations: [
+          { id: "COLOR", value_name: g("cor")     },
+          { id: "SIZE",  value_name: g("tamanho") }
+        ],
+        price:              preco,
+        available_quantity: qtd,
+        ...(g("sku") ? { seller_custom_field: g("sku") } : {})
+      }
+    ]
+  };
+
+  // Garantia só se preenchida
+  if (g("garantia")) body.warranty = g("garantia");
+
+  return { body, descricao: g("descricao"), titulo };
 }
 
-/* ── RENDER RESULTADOS ───────────────────────────────────────────────── */
-function renderR(data){
-  const area=document.getElementById("resultArea");
-  area.innerHTML="";
-  const errs=data.filter(r=>r.erro).length;
-  const h=document.createElement("div");
-  h.className="rh";
-  h.textContent=errs===0?`✅ ${data.length} anúncio(s) publicado(s) com sucesso!`:`⚠️ Publicação concluída com ${errs} falha(s)`;
-  area.appendChild(h);
+/* ── VALIDAR CARD ────────────────────────────────────────────────── */
+function validar(card) {
+  const g = n => { const e = card.querySelector(`[name="${n}"]`); return e ? e.value.trim() : ""; };
+  const precoRaw = g("preco").replace(/\D/g, "");
+  const preco = precoRaw ? parseInt(precoRaw, 10) / 100 : 0;
+  const imgs = ["img1","img2","img3","img4"].map(n => g(n)).filter(Boolean);
 
-  data.forEach(r=>{
-    const row=document.createElement("div");
-    row.className=`rr ${r.sucesso?"ok":"er"}`;
+  if (!g("titulo"))    return "Preencha o título";
+  if (!preco)          return "Preencha o preço";
+  if (!imgs.length)    return "Adicione ao menos 1 imagem (https://...)";
+  if (!g("marca"))     return "Preencha a marca";
+  if (!g("cor"))       return "Selecione a cor";
+  if (!g("tamanho"))   return "Selecione o tamanho";
+  if (!g("sexo"))      return "Selecione o gênero";
+  return null;
+}
 
-    if(r.sucesso){
-      row.innerHTML=`<span style="font-size:18px">✔</span>
-        <div><b>${r.produto}</b> — ID: ${r.id}
-        ${r.link?`<br><a class="rl" href="${r.link}" target="_blank">🔗 Ver anúncio no Mercado Livre</a>`:""}</div>`;
-    } else {
-      const det=r.detalhe||{};
-      let causas=[];
+/* ── PUBLICAR — chama ML direto do browser ──────────────────────── */
+async function publicar() {
+  const btn = document.getElementById("btnPub");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="sp"></span> Publicando...';
+  document.getElementById("resultArea").innerHTML = "";
 
-      // Usar cause_pt (traduzido pelo backend) se disponível
-      if(Array.isArray(det.cause_pt)&&det.cause_pt.length>0){
-        causas=det.cause_pt.map(c=>c.message_pt||traduzir(c.message)||JSON.stringify(c));
-      } else if(Array.isArray(det.cause)&&det.cause.length>0){
-        causas=det.cause.map(c=>traduzir(c.message||c.code||JSON.stringify(c)));
-      } else {
-        causas=[traduzir(det.message||JSON.stringify(det))];
+  if (!token) {
+    showAlert("Token não encontrado — reconecte sua conta", "er");
+    btn.disabled = false; btn.innerHTML = "Publicar tudo";
+    return;
+  }
+
+  const cards = document.querySelectorAll(".card");
+  const resultados = [];
+
+  for (const card of cards) {
+    const erro = validar(card);
+    if (erro) {
+      showAlert(erro, "er");
+      btn.disabled = false; btn.innerHTML = "Publicar tudo";
+      return;
+    }
+
+    const { body, descricao, titulo } = montarBody(card);
+
+    // LOG no console do browser para debug
+    console.log("══ BODY ENVIADO À ML ══");
+    console.log(JSON.stringify(body, null, 2));
+
+    try {
+      // ── 1. Criar item
+      const mlRes = await fetch("https://api.mercadolibre.com/items", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type":  "application/json"
+        },
+        body: JSON.stringify(body)
+      });
+
+      const mlData = await mlRes.json();
+      console.log("══ RESPOSTA ML ══");
+      console.log(JSON.stringify(mlData, null, 2));
+
+      if (!mlRes.ok || mlData.error) {
+        resultados.push({ erro: true, titulo, mlData });
+        continue;
       }
 
-      const cHtml=causas.map(c=>`• ${c}`).join("<br>");
-      const rawJson=JSON.stringify(det,null,2);
-      const dbgId="d"+Math.random().toString(36).substr(2,6);
+      // ── 2. Descrição (endpoint separado)
+      if (descricao) {
+        await fetch(`https://api.mercadolibre.com/items/${mlData.id}/description`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type":  "application/json"
+          },
+          body: JSON.stringify({ plain_text: descricao })
+        }).catch(e => console.warn("Descrição não salva:", e));
+      }
 
-      row.innerHTML=`<span style="font-size:18px">✖</span>
+      resultados.push({ sucesso: true, titulo, id: mlData.id, link: mlData.permalink });
+
+    } catch (err) {
+      resultados.push({ erro: true, titulo, mlData: { message: err.message } });
+    }
+  }
+
+  renderResultados(resultados);
+
+  const erros = resultados.filter(r => r.erro).length;
+  if (!erros) showAlert(`✅ ${resultados.length} anúncio(s) publicado(s) com sucesso!`, "ok");
+  else        showAlert(`⚠️ ${erros} erro(s) — veja detalhes acima`, "er");
+
+  btn.disabled = false;
+  btn.innerHTML = "Publicar tudo";
+}
+
+/* ── RENDERIZAR RESULTADOS ──────────────────────────────────────── */
+function renderResultados(data) {
+  const area = document.getElementById("resultArea");
+  area.innerHTML = "";
+
+  const erros = data.filter(r => r.erro).length;
+  const h = document.createElement("div");
+  h.className = "rh";
+  h.textContent = erros === 0
+    ? `✅ ${data.length} anúncio(s) publicado(s) com sucesso!`
+    : `⚠️ Publicação concluída com ${erros} falha(s)`;
+  area.appendChild(h);
+
+  data.forEach(r => {
+    const row = document.createElement("div");
+    row.className = `rr ${r.sucesso ? "ok" : "er"}`;
+
+    if (r.sucesso) {
+      row.innerHTML = `<span style="font-size:18px">✔</span>
+        <div>
+          <b>${r.titulo}</b> — ID: ${r.id}
+          ${r.link ? `<br><a class="rl" href="${r.link}" target="_blank">🔗 Ver anúncio no Mercado Livre</a>` : ""}
+        </div>`;
+    } else {
+      const det = r.mlData || {};
+      let causas = [];
+
+      if (Array.isArray(det.cause) && det.cause.length > 0) {
+        causas = det.cause.map(c => traduzir(c.message || c.code || JSON.stringify(c)));
+      } else if (det.message || det.error) {
+        causas = [traduzir(det.message || det.error)];
+      } else {
+        causas = [traduzir(JSON.stringify(det))];
+      }
+
+      const cHtml = causas.map(c => `• ${c}`).join("<br>");
+      const rawJson = JSON.stringify(det, null, 2);
+      const dbgId = "d" + Math.random().toString(36).substr(2, 6);
+
+      row.innerHTML = `<span style="font-size:18px">✖</span>
         <div style="flex:1">
-          <b>${r.produto}</b>
+          <b>${r.titulo}</b>
           <div class="rc">${cHtml}</div>
-          <span class="dt" onclick="var el=document.getElementById('${dbgId}');el.style.display=el.style.display==='none'?'block':'none'">▸ ver resposta completa da ML</span>
+          <span class="dt" onclick="var el=document.getElementById('${dbgId}');el.style.display=el.style.display==='none'?'block':'none'">
+            ▸ ver resposta completa da ML
+          </span>
           <pre class="dbg" id="${dbgId}">${rawJson}</pre>
         </div>`;
     }
     area.appendChild(row);
   });
-  area.scrollIntoView({behavior:"smooth"});
+
+  area.scrollIntoView({ behavior: "smooth" });
 }
 </script>
 </body>
