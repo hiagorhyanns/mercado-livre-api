@@ -27,55 +27,95 @@ body { background: #f0f2f5; min-height: 100vh; }
 }
 .card-header {
   display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 20px; padding-bottom: 14px; border-bottom: 2px solid #f0f0f0;
 }
 .card-num {
-  font-size: 13px; font-weight: 600; color: #3483fa;
-  background: #e8f0fe; padding: 4px 12px; border-radius: 20px;
+  font-size: 13px; font-weight: 700; color: #3483fa;
+  background: #e8f0fe; padding: 5px 14px; border-radius: 20px;
 }
 
-label {
-  display: block; font-size: 12px; font-weight: 600;
-  color: #555; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;
+/* SEÇÕES */
+.section {
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #f5f5f5;
 }
-.field { margin-bottom: 14px; }
+.section:last-child { border-bottom: none; margin-bottom: 0; }
+.section-title {
+  font-size: 11px; font-weight: 700; color: #3483fa;
+  text-transform: uppercase; letter-spacing: 1px;
+  margin-bottom: 14px;
+  display: flex; align-items: center; gap: 6px;
+}
+.section-title span { font-size: 15px; }
+
+.field { margin-bottom: 12px; }
 .field-row { display: flex; gap: 10px; flex-wrap: wrap; }
 .field-row .field { flex: 1; min-width: 140px; }
+
+label {
+  display: block; font-size: 11px; font-weight: 600;
+  color: #666; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.optional-tag {
+  font-size: 9px; font-weight: 500; color: #aaa;
+  background: #f5f5f5; border-radius: 4px;
+  padding: 1px 5px; margin-left: 5px; text-transform: lowercase; letter-spacing: 0;
+}
 
 input, textarea, select {
   padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px;
   width: 100%; font-size: 14px; font-family: 'Inter';
-  transition: border-color 0.2s; background: #fafafa;
+  transition: border-color 0.2s; background: #fafafa; color: #333;
 }
 input:focus, textarea:focus, select:focus {
   border-color: #3483fa; outline: none; background: white;
 }
-textarea { height: 70px; resize: vertical; }
+textarea { height: 80px; resize: vertical; }
 
-.extra-box {
-  background: #fffbf0; border: 1px solid #f0c040;
-  border-radius: 8px; padding: 16px; margin-bottom: 14px;
+/* LISTING TYPE TOGGLE */
+.listing-toggle { display: flex; gap: 10px; }
+.listing-opt {
+  flex: 1; border: 2px solid #ddd; border-radius: 8px;
+  padding: 12px; cursor: pointer; transition: all 0.2s; text-align: center;
 }
-.extra-box-title {
-  font-size: 12px; font-weight: 700; color: #b8860b;
-  text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;
-}
+.listing-opt:hover { border-color: #3483fa; }
+.listing-opt.active { border-color: #3483fa; background: #e8f0fe; }
+.listing-opt.active-green { border-color: #00a650; background: #e6f7ee; }
+.listing-opt input { display: none; }
+.listing-opt .lo-title { font-size: 13px; font-weight: 700; color: #333; }
+.listing-opt .lo-sub   { font-size: 11px; color: #888; margin-top: 2px; }
 
+/* MULTI-SELECT CHIP */
+.chip-group { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.chip {
+  padding: 5px 12px; border: 1.5px solid #ddd; border-radius: 20px;
+  font-size: 12px; cursor: pointer; color: #555; background: #fafafa;
+  transition: all 0.15s; user-select: none;
+}
+.chip:hover  { border-color: #3483fa; color: #3483fa; }
+.chip.active { border-color: #3483fa; background: #3483fa; color: white; }
+
+/* TÍTULO */
 .titulo-wrap { position: relative; }
 .titulo-counter {
   position: absolute; right: 10px; top: 10px;
   font-size: 11px; color: #aaa; pointer-events: none;
 }
 
+/* RESULTADOS */
 .result-row {
   display: flex; align-items: flex-start; gap: 10px;
   padding: 12px 16px; border-radius: 6px; margin-bottom: 6px; font-size: 13px;
 }
 .result-ok  { background: #e8f8ef; color: #007a35; }
 .result-err { background: #fff0f0; color: #cc0000; }
-.result-cause { font-size: 11px; margin-top: 4px; opacity: 0.85; line-height: 1.5; }
+.result-cause {
+  font-size: 11px; margin-top: 5px; line-height: 1.6; opacity: 0.9;
+}
 .result-link { font-size: 11px; color: #3483fa; }
 
+/* BOTÕES */
 .btn-bar {
   position: fixed; bottom: 0; left: 0; right: 0;
   background: white; border-top: 1px solid #e0e0e0;
@@ -90,14 +130,11 @@ button:active { transform: scale(0.98); }
 .btn-add     { background: #e8f0fe; color: #3483fa; }
 .btn-publish { background: #3483fa; color: white; min-width: 200px; }
 .btn-publish:disabled { background: #999; cursor: not-allowed; transform: none; }
-.btn-remove  {
-  background: transparent; color: #ccc;
-  padding: 4px 10px; font-size: 20px; line-height: 1;
-}
+.btn-remove  { background: transparent; color: #ccc; padding: 4px 10px; font-size: 22px; line-height: 1; }
 .btn-remove:hover { color: #ff3b3b; }
 
 .spinner {
-  display: inline-block; width: 16px; height: 16px;
+  display: inline-block; width: 15px; height: 15px;
   border: 2px solid rgba(255,255,255,0.4); border-top-color: white;
   border-radius: 50%; animation: spin 0.7s linear infinite;
   vertical-align: middle; margin-right: 6px;
@@ -106,12 +143,12 @@ button:active { transform: scale(0.98); }
 
 .alert {
   position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-  padding: 14px 24px; border-radius: 8px; font-weight: 600; color: white;
-  z-index: 999; box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-  animation: fadeOut 4.5s forwards;
+  padding: 14px 28px; border-radius: 8px; font-weight: 600; color: white;
+  z-index: 999; box-shadow: 0 4px 20px rgba(0,0,0,0.25); white-space: nowrap;
+  animation: fadeOut 5s forwards;
 }
 .success { background: #00a650; }
-.error   { background: #ff3b3b; }
+.error   { background: #e03030; }
 @keyframes fadeOut { 0%,75%{opacity:1} 100%{opacity:0} }
 
 #resultArea { margin-bottom: 20px; }
@@ -139,26 +176,41 @@ button:active { transform: scale(0.98); }
 <script>
 const token = new URLSearchParams(window.location.search).get("token");
 
-// Atributos que já gerenciamos — não vão aparecer como "extras"
-const HANDLED = new Set([
-  "BRAND","GENDER","COLOR","SIZE","MODEL","ALPHANUMERIC_SIZE",
-  "SELLER_SKU","ITEM_CONDITION","GTIN","MPN","PACKAGE_WIDTH",
-  "PACKAGE_HEIGHT","PACKAGE_LENGTH","PACKAGE_WEIGHT"
-]);
+// ─── DADOS FIXOS PARA VESTIDOS ─────────────────────────────────────────────
+const OCASIOES = [
+  "Aniversário","Calor","Casamento","Casual","Festa","Igreja",
+  "Shopping","Verão","Gestante","Trabalho","Formatura","Praia"
+];
+const ESTILOS = ["Elegante","Casual","Romântico","Moderno","Clássico","Boho","Esportivo"];
+const MATERIAIS = [
+  "Viscolinho","Viscose","Algodão","Linho","Poliéster","Malha","Crepe",
+  "Cetim","Renda","Duna","Oxford","Suede","Couro","Jeans"
+];
+const TIPOS_COMPRIMENTO = ["Curto","Midi","Longo","Mini","Maxi"];
+const TIPOS_MANGA = [
+  "Sem manga","Alças finas","Ombro a ombro","Meia manga",
+  "Manga curta","Manga 3/4","Manga longa"
+];
+const TIPOS_GOLA = [
+  "Decote V","Quadrado","Redondo","Canoa","Assimétrico",
+  "Tomara que caia","Frente única","Laço"
+];
+const TIPOS_VESTIDO = [
+  "Solto","Justo","Evase","Envelope","Tubinho","Chemise","Wrap"
+];
+const TEMPORADAS = ["Primavera/Verão","Outono/Inverno","Todas as estações"];
+const IDADES    = ["Adultos","Jovem adulto","Criança"];
 
-const attrCache = {};
-
-// ─── ALERT ───────────────────────────────────────────────────────────────────
+// ─── UTILITÁRIOS ──────────────────────────────────────────────────────────
 function showAlert(msg, type = "success") {
   document.querySelectorAll(".alert").forEach(a => a.remove());
-  const div = document.createElement("div");
-  div.className = `alert ${type}`;
-  div.innerText = msg;
-  document.body.appendChild(div);
-  setTimeout(() => div.remove(), 4500);
+  const d = document.createElement("div");
+  d.className = `alert ${type}`;
+  d.innerText = msg;
+  document.body.appendChild(d);
+  setTimeout(() => d.remove(), 5000);
 }
 
-// ─── PREÇO ───────────────────────────────────────────────────────────────────
 function formatarPreco(input) {
   let v = input.value.replace(/\D/g, "");
   if (!v) { input.value = ""; return; }
@@ -166,7 +218,6 @@ function formatarPreco(input) {
   input.value = "R$ " + v;
 }
 
-// ─── TÍTULO ──────────────────────────────────────────────────────────────────
 function gerarTitulo(card) {
   const g = n => { const e = card.querySelector(`[name="${n}"]`); return e ? e.value.trim() : ""; };
   const t = [g("produto"),g("modelo"),g("marca"),g("cor"),g("sexo")].filter(Boolean).join(" ").substring(0,60);
@@ -179,91 +230,43 @@ function atualizarContador(input) {
   if (c) c.textContent = input.value.length + "/60";
 }
 
-// ─── NUMERAÇÃO ───────────────────────────────────────────────────────────────
 function atualizarNumeracao() {
-  document.querySelectorAll(".card").forEach((card, i) => {
-    const n = card.querySelector(".card-num");
+  document.querySelectorAll(".card").forEach((c, i) => {
+    const n = c.querySelector(".card-num");
     if (n) n.textContent = `Anúncio ${i + 1}`;
   });
   document.getElementById("contadorLabel").textContent =
     document.querySelectorAll(".card").length + " anúncio(s)";
 }
-function removerCard(btn) {
-  btn.closest(".card").remove();
-  atualizarNumeracao();
+function removerCard(btn) { btn.closest(".card").remove(); atualizarNumeracao(); }
+
+// ─── CHIPS MULTI-SELEÇÃO ─────────────────────────────────────────────────
+function buildChips(container, items, name) {
+  container.innerHTML = `<div class="chip-group" data-name="${name}">` +
+    items.map(item =>
+      `<div class="chip" data-value="${item}" onclick="toggleChip(this)">${item}</div>`
+    ).join("") + `</div>`;
+}
+function toggleChip(el) { el.classList.toggle("active"); }
+function getChips(card, name) {
+  const g = card.querySelector(`.chip-group[data-name="${name}"]`);
+  if (!g) return [];
+  return [...g.querySelectorAll(".chip.active")].map(c => c.dataset.value);
 }
 
-// ─── BUSCAR ATRIBUTOS OBRIGATÓRIOS DA ML ────────────────────────────────────
-async function carregarAtributosExtras(categoryId, container) {
-  container.style.display = "block";
-  container.innerHTML = `<div class="extra-box-title">⏳ Buscando campos da categoria...</div>`;
-
-  try {
-    if (!attrCache[categoryId]) {
-      const res = await fetch(`https://api.mercadolibre.com/categories/${categoryId}/attributes`);
-      attrCache[categoryId] = await res.json();
-    }
-
-    const attrs = attrCache[categoryId];
-
-    // Somente obrigatórios que não tratamos
-    const extras = attrs.filter(a =>
-      a.tags?.required === true &&
-      !HANDLED.has(a.id)
-    );
-
-    if (extras.length === 0) {
-      container.style.display = "none";
-      container.innerHTML = "";
-      return;
-    }
-
-    container.innerHTML = `<div class="extra-box-title">⚠️ Campos obrigatórios desta categoria (${extras.length})</div>`;
-
-    const row = document.createElement("div");
-    row.className = "field-row";
-
-    extras.forEach(attr => {
-      const field = document.createElement("div");
-      field.className = "field";
-
-      if (attr.allowed_values && attr.allowed_values.length > 0) {
-        field.innerHTML = `
-          <label>${attr.name}</label>
-          <select data-attr-id="${attr.id}" data-attr-name="${attr.name}">
-            <option value="">Selecione</option>
-            ${attr.allowed_values.map(v =>
-              `<option value="${v.id}" data-vname="${v.name}">${v.name}</option>`
-            ).join("")}
-          </select>`;
-      } else {
-        field.innerHTML = `
-          <label>${attr.name}</label>
-          <input data-attr-id="${attr.id}" data-attr-name="${attr.name}"
-            placeholder="Digite ${attr.name}"
-            type="${attr.value_type === 'number' ? 'number' : 'text'}">`;
-      }
-
-      row.appendChild(field);
-    });
-
-    container.appendChild(row);
-
-  } catch (e) {
-    container.innerHTML = `<div style="color:#999;font-size:12px">Não foi possível carregar campos extras (${e.message}).</div>`;
+// ─── LISTING TYPE ────────────────────────────────────────────────────────
+function selectListing(card, value) {
+  card.querySelectorAll(".listing-opt").forEach(o => {
+    o.classList.remove("active","active-green");
+  });
+  const selected = card.querySelector(`.listing-opt[data-value="${value}"]`);
+  if (selected) {
+    selected.classList.add(value === "gold_special" ? "active" : "active-green");
   }
+  card.querySelector('[name="listing_type"]').value = value;
 }
 
-// ─── CATEGORIA MUDOU ─────────────────────────────────────────────────────────
-function onCategoriaChange(select) {
-  const card = select.closest(".card");
-  const box  = card.querySelector(".extra-box");
-  const cat  = select.value;
-  if (cat) carregarAtributosExtras(cat, box);
-  else box.style.display = "none";
-}
-
-// ─── ADD FORM ─────────────────────────────────────────────────────────────────
+// ─── ADD FORM ─────────────────────────────────────────────────────────────
 function addForm() {
   const div = document.createElement("div");
   div.className = "card";
@@ -272,140 +275,300 @@ function addForm() {
   div.innerHTML = `
     <div class="card-header">
       <span class="card-num">Anúncio ${idx}</span>
-      <button class="btn-remove" onclick="removerCard(this)">×</button>
+      <button class="btn-remove" onclick="removerCard(this)" title="Remover">×</button>
     </div>
 
-    <div class="field">
-      <label>Categoria</label>
-      <select name="categoria" onchange="onCategoriaChange(this)">
-        <option value="MLB1430">Vestidos (MLB1430)</option>
-        <option value="MLB1196">Blusas e Camisetas Femininas (MLB1196)</option>
-        <option value="MLB1292">Calças Femininas (MLB1292)</option>
-        <option value="MLB1294">Saias (MLB1294)</option>
-        <option value="MLB1435">Macacões e Macaquinhos (MLB1435)</option>
-        <option value="MLB1182">Conjuntos Femininos (MLB1182)</option>
-        <option value="MLB1269">Camisas Masculinas (MLB1269)</option>
-        <option value="MLB1273">Calças Masculinas (MLB1273)</option>
-      </select>
+    <!-- ①  TIPO DE ANÚNCIO -->
+    <div class="section">
+      <div class="section-title"><span>📋</span> Tipo de anúncio</div>
+      <input type="hidden" name="listing_type" value="gold_special">
+      <div class="listing-toggle">
+        <div class="listing-opt active" data-value="gold_special" onclick="selectListing(this.closest('.card'),'gold_special')">
+          <div class="lo-title">🥈 Clássico</div>
+          <div class="lo-sub">gold_special · sem custo fixo</div>
+        </div>
+        <div class="listing-opt" data-value="gold_pro" onclick="selectListing(this.closest('.card'),'gold_pro')">
+          <div class="lo-title">🥇 Premium</div>
+          <div class="lo-sub">gold_pro · maior visibilidade</div>
+        </div>
+      </div>
     </div>
 
-    <!-- CAMPOS EXTRAS DINÂMICOS -->
-    <div class="extra-box" style="display:none"></div>
+    <!-- ②  CATEGORIA -->
+    <div class="section">
+      <div class="section-title"><span>🏷️</span> Categoria</div>
+      <div class="field">
+        <select name="categoria">
+          <option value="MLB1430">Vestidos (MLB1430)</option>
+          <option value="MLB1196">Blusas e Camisetas Femininas (MLB1196)</option>
+          <option value="MLB1292">Calças Femininas (MLB1292)</option>
+          <option value="MLB1294">Saias (MLB1294)</option>
+          <option value="MLB1435">Macacões e Macaquinhos (MLB1435)</option>
+          <option value="MLB1182">Conjuntos Femininos (MLB1182)</option>
+          <option value="MLB1269">Camisas Masculinas (MLB1269)</option>
+          <option value="MLB1273">Calças Masculinas (MLB1273)</option>
+        </select>
+      </div>
+    </div>
 
-    <div class="field">
-      <label>URLs das Imagens</label>
+    <!-- ③  IMAGENS -->
+    <div class="section">
+      <div class="section-title"><span>🖼️</span> Imagens</div>
       <div class="field-row">
-        <div class="field"><input name="img1" placeholder="Imagem 1 (obrigatória)"></div>
-        <div class="field"><input name="img2" placeholder="Imagem 2"></div>
-        <div class="field"><input name="img3" placeholder="Imagem 3"></div>
-        <div class="field"><input name="img4" placeholder="Imagem 4"></div>
+        <div class="field"><label>Imagem 1 <span style="color:red">*</span></label><input name="img1" placeholder="https://..."></div>
+        <div class="field"><label>Imagem 2 <span class="optional-tag">opcional</span></label><input name="img2" placeholder="https://..."></div>
+        <div class="field"><label>Imagem 3 <span class="optional-tag">opcional</span></label><input name="img3" placeholder="https://..."></div>
+        <div class="field"><label>Imagem 4 <span class="optional-tag">opcional</span></label><input name="img4" placeholder="https://..."></div>
       </div>
     </div>
 
-    <div class="field-row">
-      <div class="field">
-        <label>Produto</label>
-        <input name="produto" placeholder="ex: Vestido Midi" oninput="gerarTitulo(this.closest('.card'))">
-      </div>
-      <div class="field">
-        <label>Modelo</label>
-        <input name="modelo" placeholder="ex: Floral Verão" oninput="gerarTitulo(this.closest('.card'))">
-      </div>
-      <div class="field">
-        <label>Marca</label>
-        <input name="marca" placeholder="ex: Zara" oninput="gerarTitulo(this.closest('.card'))">
-      </div>
-    </div>
+    <!-- ④  DADOS PRINCIPAIS -->
+    <div class="section">
+      <div class="section-title"><span>👗</span> Dados do produto</div>
 
-    <div class="field-row">
-      <div class="field">
-        <label>Cor</label>
-        <select name="cor" onchange="gerarTitulo(this.closest('.card'))">
-          <option value="">Selecione</option>
-          <option>Preto</option><option>Branco</option><option>Vermelho</option>
-          <option>Azul</option><option>Rosa</option><option>Verde</option>
-          <option>Amarelo</option><option>Roxo</option><option>Laranja</option>
-          <option>Cinza</option><option>Bege</option><option>Marrom</option>
-          <option>Vinho</option><option>Nude</option><option>Estampado</option>
-          <option>Multicolorido</option>
-        </select>
+      <div class="field-row">
+        <div class="field">
+          <label>Produto <span style="color:red">*</span></label>
+          <input name="produto" placeholder="ex: Vestido" oninput="gerarTitulo(this.closest('.card'))">
+        </div>
+        <div class="field">
+          <label>Modelo <span class="optional-tag">opcional</span></label>
+          <input name="modelo" placeholder="ex: Floral Longo" oninput="gerarTitulo(this.closest('.card'))">
+        </div>
+        <div class="field">
+          <label>Marca <span style="color:red">*</span></label>
+          <input name="marca" placeholder="ex: Zara" oninput="gerarTitulo(this.closest('.card'))">
+        </div>
       </div>
-      <div class="field">
-        <label>Gênero</label>
-        <select name="sexo" onchange="gerarTitulo(this.closest('.card'))">
-          <option value="">Selecione</option>
-          <option value="Feminino">Feminino</option>
-          <option value="Masculino">Masculino</option>
-          <option value="Unissex">Unissex</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Tamanho</label>
-        <select name="tamanho">
-          <option value="">Selecione</option>
-          <optgroup label="Numérico">
-            <option>34</option><option>36</option><option>38</option>
-            <option>40</option><option>42</option><option>44</option>
-            <option>46</option><option>48</option><option>50</option>
-          </optgroup>
-          <optgroup label="Letras">
-            <option>PP</option><option>P</option><option>M</option>
-            <option>G</option><option>GG</option><option>XGG</option>
-          </optgroup>
-          <optgroup label="Único">
+
+      <div class="field-row">
+        <div class="field">
+          <label>Cor <span style="color:red">*</span></label>
+          <select name="cor" onchange="gerarTitulo(this.closest('.card'))">
+            <option value="">Selecione</option>
+            <option>Preto</option><option>Branco</option><option>Vermelho</option>
+            <option>Azul</option><option>Rosa</option><option>Verde</option>
+            <option>Amarelo</option><option>Roxo</option><option>Laranja</option>
+            <option>Cinza</option><option>Bege</option><option>Marrom</option>
+            <option>Vinho</option><option>Nude</option><option>Estampado</option>
+            <option>Multicolorido</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Gênero <span style="color:red">*</span></label>
+          <select name="sexo" onchange="gerarTitulo(this.closest('.card'))">
+            <option value="">Selecione</option>
+            <option value="Feminino">Feminino</option>
+            <option value="Masculino">Masculino</option>
+            <option value="Unissex">Unissex</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Tamanho <span style="color:red">*</span></label>
+          <select name="tamanho">
+            <option value="">Selecione</option>
+            <optgroup label="Numérico">
+              <option>34</option><option>36</option><option>38</option>
+              <option>40</option><option>42</option><option>44</option>
+              <option>46</option><option>48</option><option>50</option>
+            </optgroup>
+            <optgroup label="Letras">
+              <option>PP</option><option>P</option><option>M</option>
+              <option>G</option><option>GG</option><option>XGG</option>
+            </optgroup>
             <option>Único</option>
-          </optgroup>
-        </select>
+          </select>
+        </div>
       </div>
     </div>
 
-    <div class="field">
-      <label>Título do Anúncio (máx. 60 caracteres)</label>
-      <div class="titulo-wrap">
-        <input name="titulo" placeholder="Gerado automaticamente ou edite" maxlength="60" oninput="atualizarContador(this)">
-        <span class="titulo-counter">0/60</span>
+    <!-- ⑤  CARACTERÍSTICAS VESTIDO -->
+    <div class="section">
+      <div class="section-title"><span>✨</span> Características do vestido</div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Material principal <span class="optional-tag">opcional</span></label>
+          <select name="material">
+            <option value="">Selecione</option>
+            ${MATERIAIS.map(m => `<option>${m}</option>`).join("")}
+          </select>
+        </div>
+        <div class="field">
+          <label>Tipo de comprimento <span class="optional-tag">opcional</span></label>
+          <select name="tipo_comprimento">
+            <option value="">Selecione</option>
+            ${TIPOS_COMPRIMENTO.map(m => `<option>${m}</option>`).join("")}
+          </select>
+        </div>
+        <div class="field">
+          <label>Tipo de manga <span class="optional-tag">opcional</span></label>
+          <select name="tipo_manga">
+            <option value="">Selecione</option>
+            ${TIPOS_MANGA.map(m => `<option>${m}</option>`).join("")}
+          </select>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Tipo de gola <span class="optional-tag">opcional</span></label>
+          <select name="tipo_gola">
+            <option value="">Selecione</option>
+            ${TIPOS_GOLA.map(m => `<option>${m}</option>`).join("")}
+          </select>
+        </div>
+        <div class="field">
+          <label>Tipo de vestido <span class="optional-tag">opcional</span></label>
+          <select name="tipo_vestido">
+            <option value="">Selecione</option>
+            ${TIPOS_VESTIDO.map(m => `<option>${m}</option>`).join("")}
+          </select>
+        </div>
+        <div class="field">
+          <label>Temporada <span class="optional-tag">opcional</span></label>
+          <select name="temporada">
+            <option value="">Selecione</option>
+            ${TEMPORADAS.map(m => `<option>${m}</option>`).join("")}
+          </select>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Faixa etária <span class="optional-tag">opcional</span></label>
+          <select name="faixa_etaria">
+            <option value="">Selecione</option>
+            ${IDADES.map(m => `<option>${m}</option>`).join("")}
+          </select>
+        </div>
+        <div class="field">
+          <label>Apto para gestante <span class="optional-tag">opcional</span></label>
+          <select name="gestante">
+            <option value="">Selecione</option>
+            <option value="Sim">Sim</option>
+            <option value="Não">Não</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Ocasiões <span class="optional-tag">opcional · múltipla escolha</span></label>
+        <div id="chips-ocasioes-${idx}" class="chips-wrap"></div>
+      </div>
+
+      <div class="field">
+        <label>Estilos <span class="optional-tag">opcional · múltipla escolha</span></label>
+        <div id="chips-estilos-${idx}" class="chips-wrap"></div>
       </div>
     </div>
 
-    <div class="field">
-      <label>Descrição</label>
-      <textarea name="descricao" placeholder="Descrição do produto (opcional)"></textarea>
+    <!-- ⑥  TÍTULO E DESCRIÇÃO -->
+    <div class="section">
+      <div class="section-title"><span>📝</span> Título e descrição</div>
+
+      <div class="field">
+        <label>Título <span style="color:red">*</span> (máx. 60 caracteres)</label>
+        <div class="titulo-wrap">
+          <input name="titulo" placeholder="Gerado automaticamente ou edite" maxlength="60" oninput="atualizarContador(this)">
+          <span class="titulo-counter">0/60</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Descrição <span class="optional-tag">opcional</span></label>
+        <textarea name="descricao" placeholder="Detalhe o produto: tecido, caimento, cuidados, etc."></textarea>
+      </div>
     </div>
 
-    <div class="field" style="max-width:220px">
-      <label>Preço</label>
-      <input name="preco" placeholder="R$ 0,00" oninput="formatarPreco(this)">
+    <!-- ⑦  PREÇO, ESTOQUE, SKU, GARANTIA -->
+    <div class="section">
+      <div class="section-title"><span>💰</span> Preço e estoque</div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Preço <span style="color:red">*</span></label>
+          <input name="preco" placeholder="R$ 0,00" oninput="formatarPreco(this)">
+        </div>
+        <div class="field">
+          <label>Estoque (qtd) <span style="color:red">*</span></label>
+          <input name="quantidade" type="number" min="1" value="10" placeholder="10">
+        </div>
+        <div class="field">
+          <label>SKU <span class="optional-tag">opcional</span></label>
+          <input name="sku" placeholder="Código interno do produto">
+        </div>
+        <div class="field">
+          <label>Garantia <span class="optional-tag">opcional</span></label>
+          <input name="garantia" placeholder="ex: 30 dias garantia de fábrica">
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑧  DIMENSÕES E PESO -->
+    <div class="section">
+      <div class="section-title"><span>📦</span> Dimensões e peso <span class="optional-tag" style="font-size:10px;letter-spacing:0">opcional</span></div>
+      <div class="field-row">
+        <div class="field">
+          <label>Peso (kg)</label>
+          <input name="peso_kg" type="number" step="0.01" placeholder="ex: 0.5">
+        </div>
+        <div class="field">
+          <label>Largura (cm)</label>
+          <input name="largura_cm" type="number" placeholder="ex: 30">
+        </div>
+        <div class="field">
+          <label>Altura (cm)</label>
+          <input name="altura_cm" type="number" placeholder="ex: 10">
+        </div>
+        <div class="field">
+          <label>Profundidade (cm)</label>
+          <input name="profundidade_cm" type="number" placeholder="ex: 5">
+        </div>
+      </div>
     </div>
   `;
 
   document.getElementById("formArea").appendChild(div);
   atualizarNumeracao();
 
-  // Carregar atributos da categoria padrão
-  const catSelect = div.querySelector('[name="categoria"]');
-  onCategoriaChange(catSelect);
+  // Montar chips
+  buildChips(div.querySelector(`#chips-ocasioes-${idx}`), OCASIOES, "ocasioes");
+  buildChips(div.querySelector(`#chips-estilos-${idx}`),  ESTILOS,  "estilos");
 }
 
 addForm();
 
-// ─── COLETAR ATRIBUTOS EXTRAS ────────────────────────────────────────────────
-function coletarExtras(card) {
+// ─── MONTAR EXTRA_ATTRIBUTES ──────────────────────────────────────────────
+function montarExtras(card) {
+  const g = n => { const e = card.querySelector(`[name="${n}"]`); return e ? e.value.trim() : ""; };
   const extras = [];
-  card.querySelectorAll("[data-attr-id]").forEach(el => {
-    const id   = el.dataset.attrId;
-    const name = el.dataset.attrName;
-    if (!id) return;
-    if (el.tagName === "SELECT") {
-      const opt = el.options[el.selectedIndex];
-      if (opt && opt.value) extras.push({ id, value_id: opt.value, value_name: opt.dataset.vname || opt.text });
-    } else {
-      if (el.value.trim()) extras.push({ id, value_name: el.value.trim() });
-    }
-  });
+
+  const maybe = (id, val) => { if (val) extras.push({ id, value_name: val }); };
+
+  maybe("MAIN_MATERIAL",       g("material"));
+  maybe("LENGTH_TYPE",         g("tipo_comprimento"));
+  maybe("SLEEVE_TYPE",         g("tipo_manga"));
+  maybe("COLLAR_TYPE",         g("tipo_gola"));
+  maybe("DRESS_TYPE",          g("tipo_vestido"));
+  maybe("LAUNCH_SEASON",       g("temporada"));
+  maybe("AGE_GROUP",           g("faixa_etaria"));
+  maybe("IS_FOR_PREGNANT",     g("gestante"));
+
+  // Multi-value (cada ocasião/estilo = atributo separado com mesmo id)
+  const ocasioes = getChips(card, "ocasioes");
+  if (ocasioes.length > 0) {
+    extras.push({ id: "OCCASION", value_name: ocasioes.join(", ") });
+  }
+  const estilos = getChips(card, "estilos");
+  if (estilos.length > 0) {
+    extras.push({ id: "STYLE", value_name: estilos.join(", ") });
+  }
+
   return extras;
 }
 
-// ─── PUBLICAR ─────────────────────────────────────────────────────────────────
+// ─── PUBLICAR ─────────────────────────────────────────────────────────────
 async function publicar() {
   const btn = document.getElementById("btnPublish");
   btn.disabled = true;
@@ -421,25 +584,37 @@ async function publicar() {
     const precoRaw = get(card, "preco").replace(/\D/g, "");
     const preco    = precoRaw ? parseInt(precoRaw) / 100 : 0;
     const imagens  = ["img1","img2","img3","img4"].map(n => get(card,n)).filter(Boolean);
+    const qtd      = parseInt(get(card, "quantidade")) || 10;
 
-    if (!title || !preco || !imagens.length || !get(card,"cor") || !get(card,"tamanho") || !get(card,"sexo") || !get(card,"marca")) {
-      showAlert("Preencha: título, preço, imagem, cor, tamanho, gênero e marca", "error");
-      btn.disabled = false; btn.innerHTML = "Publicar tudo";
-      return;
-    }
+    // Validação obrigatórios
+    if (!title) { showAlert("Preencha o título do anúncio", "error"); btn.disabled=false; btn.innerHTML="Publicar tudo"; return; }
+    if (!preco)  { showAlert("Preencha o preço do anúncio", "error"); btn.disabled=false; btn.innerHTML="Publicar tudo"; return; }
+    if (!imagens.length) { showAlert("Adicione ao menos 1 imagem", "error"); btn.disabled=false; btn.innerHTML="Publicar tudo"; return; }
+    if (!get(card,"marca"))   { showAlert("Preencha a marca", "error"); btn.disabled=false; btn.innerHTML="Publicar tudo"; return; }
+    if (!get(card,"cor"))     { showAlert("Selecione a cor", "error"); btn.disabled=false; btn.innerHTML="Publicar tudo"; return; }
+    if (!get(card,"tamanho")) { showAlert("Selecione o tamanho", "error"); btn.disabled=false; btn.innerHTML="Publicar tudo"; return; }
+    if (!get(card,"sexo"))    { showAlert("Selecione o gênero", "error"); btn.disabled=false; btn.innerHTML="Publicar tudo"; return; }
 
     produtos.push({
       title,
       description:      get(card, "descricao"),
       category_id:      get(card, "categoria"),
+      listing_type:     get(card, "listing_type") || "gold_special",
       price:            preco,
+      quantidade:       qtd,
       pictures:         imagens,
       marca:            get(card, "marca"),
       modelo:           get(card, "modelo"),
       cor:              get(card, "cor"),
       sexo:             get(card, "sexo"),
       tamanho:          get(card, "tamanho"),
-      extra_attributes: coletarExtras(card)
+      sku:              get(card, "sku"),
+      garantia:         get(card, "garantia"),
+      peso_kg:          get(card, "peso_kg"),
+      largura_cm:       get(card, "largura_cm"),
+      altura_cm:        get(card, "altura_cm"),
+      profundidade_cm:  get(card, "profundidade_cm"),
+      extra_attributes: montarExtras(card)
     });
   }
 
@@ -454,17 +629,19 @@ async function publicar() {
     renderResultados(data);
 
     const erros = data.filter(r => r.erro).length;
-    if (!erros) showAlert(`✅ ${data.length} anúncio(s) publicado(s)!`, "success");
+    if (!erros) showAlert(`✅ ${data.length} anúncio(s) publicado(s) com sucesso!`, "success");
     else        showAlert(`⚠️ ${erros} erro(s) — veja detalhes acima`, "error");
 
   } catch (err) {
     showAlert("Erro de conexão: " + err.message, "error");
+    console.error(err);
   }
 
-  btn.disabled = false; btn.innerHTML = "Publicar tudo";
+  btn.disabled = false;
+  btn.innerHTML = "Publicar tudo";
 }
 
-// ─── RENDERIZAR RESULTADOS ────────────────────────────────────────────────────
+// ─── RENDERIZAR RESULTADOS ────────────────────────────────────────────────
 function renderResultados(data) {
   const area = document.getElementById("resultArea");
   area.innerHTML = "";
@@ -486,12 +663,11 @@ function renderResultados(data) {
         <span>✔</span>
         <div>
           <b>${r.produto}</b> — ID: ${r.id}
-          ${r.link ? `<br><a class="result-link" href="${r.link}" target="_blank">Ver anúncio ↗</a>` : ""}
+          ${r.link ? `<br><a class="result-link" href="${r.link}" target="_blank">🔗 Ver anúncio no ML</a>` : ""}
         </div>`;
     } else {
       let detalhe = "";
       if (r.detalhe && typeof r.detalhe === "object") {
-        // Mostrar cause da ML que diz exatamente qual campo falta
         if (Array.isArray(r.detalhe.cause) && r.detalhe.cause.length > 0) {
           detalhe = r.detalhe.cause.map(c => `• ${c.message || c.code || JSON.stringify(c)}`).join("<br>");
         } else {
