@@ -34,20 +34,13 @@ body { background: #f0f2f5; min-height: 100vh; }
   background: #e8f0fe; padding: 5px 14px; border-radius: 20px;
 }
 
-/* SEÇÕES */
-.section {
-  margin-bottom: 20px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #f5f5f5;
-}
+.section { margin-bottom: 22px; padding-bottom: 22px; border-bottom: 1px solid #f5f5f5; }
 .section:last-child { border-bottom: none; margin-bottom: 0; }
 .section-title {
   font-size: 11px; font-weight: 700; color: #3483fa;
   text-transform: uppercase; letter-spacing: 1px;
-  margin-bottom: 14px;
-  display: flex; align-items: center; gap: 6px;
+  margin-bottom: 14px; display: flex; align-items: center; gap: 6px;
 }
-.section-title span { font-size: 15px; }
 
 .field { margin-bottom: 12px; }
 .field-row { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -55,13 +48,14 @@ body { background: #f0f2f5; min-height: 100vh; }
 
 label {
   display: block; font-size: 11px; font-weight: 600;
-  color: #666; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;
+  color: #555; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.4px;
 }
-.optional-tag {
+.opt-tag {
   font-size: 9px; font-weight: 500; color: #aaa;
   background: #f5f5f5; border-radius: 4px;
-  padding: 1px 5px; margin-left: 5px; text-transform: lowercase; letter-spacing: 0;
+  padding: 1px 5px; margin-left: 4px; text-transform: lowercase; letter-spacing: 0;
 }
+.req { color: #e03030; margin-left: 2px; }
 
 input, textarea, select {
   padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px;
@@ -73,20 +67,38 @@ input:focus, textarea:focus, select:focus {
 }
 textarea { height: 80px; resize: vertical; }
 
-/* LISTING TYPE TOGGLE */
-.listing-toggle { display: flex; gap: 10px; }
-.listing-opt {
-  flex: 1; border: 2px solid #ddd; border-radius: 8px;
-  padding: 12px; cursor: pointer; transition: all 0.2s; text-align: center;
+/* TOGGLE OPTIONS */
+.toggle-group { display: flex; gap: 8px; flex-wrap: wrap; }
+.toggle-opt {
+  flex: 1; min-width: 100px;
+  border: 2px solid #ddd; border-radius: 8px;
+  padding: 11px 10px; cursor: pointer; transition: all 0.18s; text-align: center;
 }
-.listing-opt:hover { border-color: #3483fa; }
-.listing-opt.active { border-color: #3483fa; background: #e8f0fe; }
-.listing-opt.active-green { border-color: #00a650; background: #e6f7ee; }
-.listing-opt input { display: none; }
-.listing-opt .lo-title { font-size: 13px; font-weight: 700; color: #333; }
-.listing-opt .lo-sub   { font-size: 11px; color: #888; margin-top: 2px; }
+.toggle-opt:hover { border-color: #3483fa; }
+.toggle-opt.sel-blue  { border-color: #3483fa; background: #e8f0fe; }
+.toggle-opt.sel-green { border-color: #00a650; background: #e6f7ee; }
+.toggle-opt.sel-orange{ border-color: #f57c00; background: #fff3e0; }
+.toggle-opt .to-title { font-size: 13px; font-weight: 700; color: #333; }
+.toggle-opt .to-sub   { font-size: 10px; color: #888; margin-top: 2px; }
 
-/* MULTI-SELECT CHIP */
+/* SWITCH (frete grátis) */
+.switch-row { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.switch { position: relative; width: 42px; height: 24px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+  position: absolute; inset: 0; background: #ccc; border-radius: 24px;
+  transition: .3s;
+}
+.slider::before {
+  content:""; position: absolute;
+  height: 18px; width: 18px; left: 3px; bottom: 3px;
+  background: white; border-radius: 50%; transition: .3s;
+}
+.switch input:checked + .slider { background: #00a650; }
+.switch input:checked + .slider::before { transform: translateX(18px); }
+.switch-label { font-size: 13px; color: #444; font-weight: 500; }
+
+/* CHIPS */
 .chip-group { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
 .chip {
   padding: 5px 12px; border: 1.5px solid #ddd; border-radius: 20px;
@@ -104,16 +116,27 @@ textarea { height: 80px; resize: vertical; }
 }
 
 /* RESULTADOS */
+.result-header { font-size: 15px; font-weight: 700; color: #333; margin-bottom: 12px; }
 .result-row {
   display: flex; align-items: flex-start; gap: 10px;
   padding: 12px 16px; border-radius: 6px; margin-bottom: 6px; font-size: 13px;
 }
-.result-ok  { background: #e8f8ef; color: #007a35; }
-.result-err { background: #fff0f0; color: #cc0000; }
-.result-cause {
-  font-size: 11px; margin-top: 5px; line-height: 1.6; opacity: 0.9;
+.result-ok  { background: #e8f8ef; color: #007a35; border-left: 3px solid #00a650; }
+.result-err { background: #fff0f0; color: #cc0000; border-left: 3px solid #e03030; }
+.result-cause { font-size: 11px; margin-top: 5px; line-height: 1.7; }
+.result-link  { font-size: 11px; color: #3483fa; }
+
+/* DEBUG BOX */
+.debug-box {
+  background: #1a1a2e; color: #e0e0e0; font-family: monospace;
+  font-size: 11px; border-radius: 6px; padding: 12px 14px;
+  margin-top: 8px; white-space: pre-wrap; word-break: break-all;
+  max-height: 200px; overflow-y: auto; display: none;
 }
-.result-link { font-size: 11px; color: #3483fa; }
+.debug-toggle {
+  font-size: 10px; color: #3483fa; cursor: pointer;
+  margin-top: 4px; display: inline-block;
+}
 
 /* BOTÕES */
 .btn-bar {
@@ -131,7 +154,7 @@ button:active { transform: scale(0.98); }
 .btn-publish { background: #3483fa; color: white; min-width: 200px; }
 .btn-publish:disabled { background: #999; cursor: not-allowed; transform: none; }
 .btn-remove  { background: transparent; color: #ccc; padding: 4px 10px; font-size: 22px; line-height: 1; }
-.btn-remove:hover { color: #ff3b3b; }
+.btn-remove:hover { color: #e03030; }
 
 .spinner {
   display: inline-block; width: 15px; height: 15px;
@@ -144,15 +167,14 @@ button:active { transform: scale(0.98); }
 .alert {
   position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
   padding: 14px 28px; border-radius: 8px; font-weight: 600; color: white;
-  z-index: 999; box-shadow: 0 4px 20px rgba(0,0,0,0.25); white-space: nowrap;
+  z-index: 999; box-shadow: 0 4px 20px rgba(0,0,0,0.25);
   animation: fadeOut 5s forwards;
 }
 .success { background: #00a650; }
 .error   { background: #e03030; }
-@keyframes fadeOut { 0%,75%{opacity:1} 100%{opacity:0} }
+@keyframes fadeOut { 0%,75%{opacity:1}100%{opacity:0} }
 
 #resultArea { margin-bottom: 20px; }
-.result-header { font-size: 15px; font-weight: 700; color: #333; margin-bottom: 12px; }
 </style>
 </head>
 <body>
@@ -176,37 +198,56 @@ button:active { transform: scale(0.98); }
 <script>
 const token = new URLSearchParams(window.location.search).get("token");
 
-// ─── DADOS FIXOS PARA VESTIDOS ─────────────────────────────────────────────
-const OCASIOES = [
-  "Aniversário","Calor","Casamento","Casual","Festa","Igreja",
-  "Shopping","Verão","Gestante","Trabalho","Formatura","Praia"
-];
-const ESTILOS = ["Elegante","Casual","Romântico","Moderno","Clássico","Boho","Esportivo"];
-const MATERIAIS = [
-  "Viscolinho","Viscose","Algodão","Linho","Poliéster","Malha","Crepe",
-  "Cetim","Renda","Duna","Oxford","Suede","Couro","Jeans"
-];
-const TIPOS_COMPRIMENTO = ["Curto","Midi","Longo","Mini","Maxi"];
-const TIPOS_MANGA = [
-  "Sem manga","Alças finas","Ombro a ombro","Meia manga",
-  "Manga curta","Manga 3/4","Manga longa"
-];
-const TIPOS_GOLA = [
-  "Decote V","Quadrado","Redondo","Canoa","Assimétrico",
-  "Tomara que caia","Frente única","Laço"
-];
-const TIPOS_VESTIDO = [
-  "Solto","Justo","Evase","Envelope","Tubinho","Chemise","Wrap"
-];
-const TEMPORADAS = ["Primavera/Verão","Outono/Inverno","Todas as estações"];
-const IDADES    = ["Adultos","Jovem adulto","Criança"];
+// ── TRADUÇÃO DE ERROS ML ───────────────────────────────────────────────────
+const TRADUCOES = {
+  "family_name":                           "Campo 'family_name' obrigatório na raiz quando há variations",
+  "price":                                 "Preço ausente dentro de variations",
+  "available_quantity":                    "Quantidade em estoque ausente dentro de variations",
+  "attribute_combinations":               "Combinações cor/tamanho ausentes em variations",
+  "The field variations is invalid":       "O campo variations está inválido — verifique family_name",
+  "The body does not contains":            "O body não contém um ou mais campos obrigatórios",
+  "item variation with errors":            "Variação do item com erros",
+  "invalid_body":                          "Body da requisição inválido",
+  "missing_field":                         "Campo obrigatório ausente",
+  "required_field":                        "Campo obrigatório ausente",
+  "invalid_field":                         "Campo com valor inválido",
+  "not found":                             "Recurso não encontrado",
+  "unauthorized":                          "Token inválido ou expirado — reconecte sua conta",
+  "forbidden":                             "Sem permissão para esta ação",
+  "invalid pictures":                      "URL de imagem inválida — use links http públicos",
+  "The resource is not reachable":         "Imagem inacessível — verifique o link da imagem",
+  "item.listing_type_id":                  "Tipo de anúncio inválido",
+  "invalid category":                      "Categoria inválida",
+  "COLOR":                                 "Atributo COR obrigatório",
+  "SIZE":                                  "Atributo TAMANHO obrigatório",
+  "BRAND":                                 "Atributo MARCA obrigatório",
+  "GENDER":                                "Atributo GÊNERO obrigatório"
+};
 
-// ─── UTILITÁRIOS ──────────────────────────────────────────────────────────
+function traduzirTexto(texto) {
+  if (!texto) return texto;
+  for (const [en, pt] of Object.entries(TRADUCOES)) {
+    if (texto.toLowerCase().includes(en.toLowerCase())) return `${pt}`;
+  }
+  return texto;
+}
+
+// ── LISTAS ─────────────────────────────────────────────────────────────────
+const OCASIOES = ["Aniversário","Calor","Casamento","Casual","Festa","Igreja","Shopping","Verão","Gestante","Trabalho","Formatura","Praia"];
+const ESTILOS  = ["Elegante","Casual","Romântico","Moderno","Clássico","Boho","Esportivo"];
+const MATERIAIS = ["Viscolinho","Viscose","Algodão","Linho","Poliéster","Malha","Crepe","Cetim","Renda","Duna","Oxford","Suede","Jeans"];
+const COMPRIMENTOS = ["Curto","Midi","Longo","Mini","Maxi"];
+const MANGAS  = ["Sem manga","Alças finas","Ombro a ombro","Meia manga","Manga curta","Manga 3/4","Manga longa"];
+const GOLAS   = ["Decote V","Quadrado","Redondo","Canoa","Assimétrico","Tomara que caia","Frente única","Laço"];
+const TIPOS_V = ["Solto","Justo","Evasê","Envelope","Tubinho","Chemise","Wrap"];
+const TEMPORADAS = ["Primavera/Verão","Outono/Inverno","Todas as estações"];
+const IDADES  = ["Adultos","Jovem adulto","Criança"];
+
+// ── UTILS ──────────────────────────────────────────────────────────────────
 function showAlert(msg, type = "success") {
   document.querySelectorAll(".alert").forEach(a => a.remove());
   const d = document.createElement("div");
-  d.className = `alert ${type}`;
-  d.innerText = msg;
+  d.className = `alert ${type}`; d.innerText = msg;
   document.body.appendChild(d);
   setTimeout(() => d.remove(), 5000);
 }
@@ -214,7 +255,7 @@ function showAlert(msg, type = "success") {
 function formatarPreco(input) {
   let v = input.value.replace(/\D/g, "");
   if (!v) { input.value = ""; return; }
-  v = (parseInt(v) / 100).toFixed(2).replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  v = (parseInt(v)/100).toFixed(2).replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g,".");
   input.value = "R$ " + v;
 }
 
@@ -222,8 +263,7 @@ function gerarTitulo(card) {
   const g = n => { const e = card.querySelector(`[name="${n}"]`); return e ? e.value.trim() : ""; };
   const t = [g("produto"),g("modelo"),g("marca"),g("cor"),g("sexo")].filter(Boolean).join(" ").substring(0,60);
   const inp = card.querySelector('[name="titulo"]');
-  inp.value = t;
-  atualizarContador(inp);
+  inp.value = t; atualizarContador(inp);
 }
 function atualizarContador(input) {
   const c = input.closest(".titulo-wrap")?.querySelector(".titulo-counter");
@@ -231,42 +271,35 @@ function atualizarContador(input) {
 }
 
 function atualizarNumeracao() {
-  document.querySelectorAll(".card").forEach((c, i) => {
-    const n = c.querySelector(".card-num");
-    if (n) n.textContent = `Anúncio ${i + 1}`;
+  document.querySelectorAll(".card").forEach((c,i) => {
+    const n = c.querySelector(".card-num"); if (n) n.textContent = `Anúncio ${i+1}`;
   });
-  document.getElementById("contadorLabel").textContent =
-    document.querySelectorAll(".card").length + " anúncio(s)";
+  document.getElementById("contadorLabel").textContent = document.querySelectorAll(".card").length + " anúncio(s)";
 }
 function removerCard(btn) { btn.closest(".card").remove(); atualizarNumeracao(); }
 
-// ─── CHIPS MULTI-SELEÇÃO ─────────────────────────────────────────────────
-function buildChips(container, items, name) {
-  container.innerHTML = `<div class="chip-group" data-name="${name}">` +
-    items.map(item =>
-      `<div class="chip" data-value="${item}" onclick="toggleChip(this)">${item}</div>`
-    ).join("") + `</div>`;
+// ── CHIPS ──────────────────────────────────────────────────────────────────
+function buildChips(wrap, items, name) {
+  wrap.innerHTML = `<div class="chip-group" data-name="${name}">` +
+    items.map(i => `<div class="chip" data-value="${i}" onclick="this.classList.toggle('active')">${i}</div>`).join("") +
+    `</div>`;
 }
-function toggleChip(el) { el.classList.toggle("active"); }
 function getChips(card, name) {
   const g = card.querySelector(`.chip-group[data-name="${name}"]`);
-  if (!g) return [];
-  return [...g.querySelectorAll(".chip.active")].map(c => c.dataset.value);
+  return g ? [...g.querySelectorAll(".chip.active")].map(c => c.dataset.value) : [];
 }
 
-// ─── LISTING TYPE ────────────────────────────────────────────────────────
-function selectListing(card, value) {
-  card.querySelectorAll(".listing-opt").forEach(o => {
-    o.classList.remove("active","active-green");
-  });
-  const selected = card.querySelector(`.listing-opt[data-value="${value}"]`);
-  if (selected) {
-    selected.classList.add(value === "gold_special" ? "active" : "active-green");
-  }
-  card.querySelector('[name="listing_type"]').value = value;
+// ── TOGGLES ────────────────────────────────────────────────────────────────
+function selectToggle(card, name, value, colorClass) {
+  const group = card.querySelector(`.toggle-group[data-name="${name}"]`);
+  if (!group) return;
+  group.querySelectorAll(".toggle-opt").forEach(o => o.className = "toggle-opt");
+  const opt = group.querySelector(`[data-value="${value}"]`);
+  if (opt) opt.classList.add(colorClass);
+  card.querySelector(`[name="${name}"]`).value = value;
 }
 
-// ─── ADD FORM ─────────────────────────────────────────────────────────────
+// ── ADD FORM ───────────────────────────────────────────────────────────────
 function addForm() {
   const div = document.createElement("div");
   div.className = "card";
@@ -275,28 +308,48 @@ function addForm() {
   div.innerHTML = `
     <div class="card-header">
       <span class="card-num">Anúncio ${idx}</span>
-      <button class="btn-remove" onclick="removerCard(this)" title="Remover">×</button>
+      <button class="btn-remove" onclick="removerCard(this)">×</button>
     </div>
 
-    <!-- ①  TIPO DE ANÚNCIO -->
+    <!-- TIPO DE ANÚNCIO -->
     <div class="section">
-      <div class="section-title"><span>📋</span> Tipo de anúncio</div>
+      <div class="section-title">📋 Tipo de anúncio</div>
       <input type="hidden" name="listing_type" value="gold_special">
-      <div class="listing-toggle">
-        <div class="listing-opt active" data-value="gold_special" onclick="selectListing(this.closest('.card'),'gold_special')">
-          <div class="lo-title">🥈 Clássico</div>
-          <div class="lo-sub">gold_special · sem custo fixo</div>
+      <div class="toggle-group" data-name="listing_type">
+        <div class="toggle-opt sel-blue" data-value="gold_special"
+          onclick="selectToggle(this.closest('.card'),'listing_type','gold_special','sel-blue')">
+          <div class="to-title">🥈 Clássico</div>
+          <div class="to-sub">gold_special</div>
         </div>
-        <div class="listing-opt" data-value="gold_pro" onclick="selectListing(this.closest('.card'),'gold_pro')">
-          <div class="lo-title">🥇 Premium</div>
-          <div class="lo-sub">gold_pro · maior visibilidade</div>
+        <div class="toggle-opt" data-value="gold_pro"
+          onclick="selectToggle(this.closest('.card'),'listing_type','gold_pro','sel-green')">
+          <div class="to-title">🥇 Premium</div>
+          <div class="to-sub">gold_pro</div>
         </div>
       </div>
     </div>
 
-    <!-- ②  CATEGORIA -->
+    <!-- CONDIÇÃO -->
     <div class="section">
-      <div class="section-title"><span>🏷️</span> Categoria</div>
+      <div class="section-title">🔖 Condição do produto</div>
+      <input type="hidden" name="condition" value="new">
+      <div class="toggle-group" data-name="condition">
+        <div class="toggle-opt sel-blue" data-value="new"
+          onclick="selectToggle(this.closest('.card'),'condition','new','sel-blue')">
+          <div class="to-title">✨ Novo</div>
+          <div class="to-sub">Produto novo</div>
+        </div>
+        <div class="toggle-opt" data-value="used"
+          onclick="selectToggle(this.closest('.card'),'condition','used','sel-orange')">
+          <div class="to-title">♻️ Usado</div>
+          <div class="to-sub">Produto usado</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CATEGORIA -->
+    <div class="section">
+      <div class="section-title">🏷️ Categoria</div>
       <div class="field">
         <select name="categoria">
           <option value="MLB1430">Vestidos (MLB1430)</option>
@@ -311,39 +364,28 @@ function addForm() {
       </div>
     </div>
 
-    <!-- ③  IMAGENS -->
+    <!-- IMAGENS -->
     <div class="section">
-      <div class="section-title"><span>🖼️</span> Imagens</div>
+      <div class="section-title">🖼️ Imagens</div>
       <div class="field-row">
-        <div class="field"><label>Imagem 1 <span style="color:red">*</span></label><input name="img1" placeholder="https://..."></div>
-        <div class="field"><label>Imagem 2 <span class="optional-tag">opcional</span></label><input name="img2" placeholder="https://..."></div>
-        <div class="field"><label>Imagem 3 <span class="optional-tag">opcional</span></label><input name="img3" placeholder="https://..."></div>
-        <div class="field"><label>Imagem 4 <span class="optional-tag">opcional</span></label><input name="img4" placeholder="https://..."></div>
+        <div class="field"><label>Imagem 1 <span class="req">*</span></label><input name="img1" placeholder="https://..."></div>
+        <div class="field"><label>Imagem 2 <span class="opt-tag">opcional</span></label><input name="img2" placeholder="https://..."></div>
+        <div class="field"><label>Imagem 3 <span class="opt-tag">opcional</span></label><input name="img3" placeholder="https://..."></div>
+        <div class="field"><label>Imagem 4 <span class="opt-tag">opcional</span></label><input name="img4" placeholder="https://..."></div>
       </div>
     </div>
 
-    <!-- ④  DADOS PRINCIPAIS -->
+    <!-- DADOS PRINCIPAIS -->
     <div class="section">
-      <div class="section-title"><span>👗</span> Dados do produto</div>
-
+      <div class="section-title">👗 Dados do produto</div>
       <div class="field-row">
-        <div class="field">
-          <label>Produto <span style="color:red">*</span></label>
-          <input name="produto" placeholder="ex: Vestido" oninput="gerarTitulo(this.closest('.card'))">
-        </div>
-        <div class="field">
-          <label>Modelo <span class="optional-tag">opcional</span></label>
-          <input name="modelo" placeholder="ex: Floral Longo" oninput="gerarTitulo(this.closest('.card'))">
-        </div>
-        <div class="field">
-          <label>Marca <span style="color:red">*</span></label>
-          <input name="marca" placeholder="ex: Zara" oninput="gerarTitulo(this.closest('.card'))">
-        </div>
+        <div class="field"><label>Produto <span class="req">*</span></label><input name="produto" placeholder="ex: Vestido" oninput="gerarTitulo(this.closest('.card'))"></div>
+        <div class="field"><label>Modelo <span class="opt-tag">opcional</span></label><input name="modelo" placeholder="ex: Floral Longo" oninput="gerarTitulo(this.closest('.card'))"></div>
+        <div class="field"><label>Marca <span class="req">*</span></label><input name="marca" placeholder="ex: Zara" oninput="gerarTitulo(this.closest('.card'))"></div>
       </div>
-
       <div class="field-row">
         <div class="field">
-          <label>Cor <span style="color:red">*</span></label>
+          <label>Cor <span class="req">*</span></label>
           <select name="cor" onchange="gerarTitulo(this.closest('.card'))">
             <option value="">Selecione</option>
             <option>Preto</option><option>Branco</option><option>Vermelho</option>
@@ -355,7 +397,7 @@ function addForm() {
           </select>
         </div>
         <div class="field">
-          <label>Gênero <span style="color:red">*</span></label>
+          <label>Gênero <span class="req">*</span></label>
           <select name="sexo" onchange="gerarTitulo(this.closest('.card'))">
             <option value="">Selecione</option>
             <option value="Feminino">Feminino</option>
@@ -364,7 +406,7 @@ function addForm() {
           </select>
         </div>
         <div class="field">
-          <label>Tamanho <span style="color:red">*</span></label>
+          <label>Tamanho <span class="req">*</span></label>
           <select name="tamanho">
             <option value="">Selecione</option>
             <optgroup label="Numérico">
@@ -382,193 +424,121 @@ function addForm() {
       </div>
     </div>
 
-    <!-- ⑤  CARACTERÍSTICAS VESTIDO -->
+    <!-- CARACTERÍSTICAS VESTIDO -->
     <div class="section">
-      <div class="section-title"><span>✨</span> Características do vestido</div>
-
+      <div class="section-title">✨ Características do vestido <span class="opt-tag" style="font-size:9px">todos opcionais</span></div>
       <div class="field-row">
-        <div class="field">
-          <label>Material principal <span class="optional-tag">opcional</span></label>
-          <select name="material">
-            <option value="">Selecione</option>
-            ${MATERIAIS.map(m => `<option>${m}</option>`).join("")}
-          </select>
-        </div>
-        <div class="field">
-          <label>Tipo de comprimento <span class="optional-tag">opcional</span></label>
-          <select name="tipo_comprimento">
-            <option value="">Selecione</option>
-            ${TIPOS_COMPRIMENTO.map(m => `<option>${m}</option>`).join("")}
-          </select>
-        </div>
-        <div class="field">
-          <label>Tipo de manga <span class="optional-tag">opcional</span></label>
-          <select name="tipo_manga">
-            <option value="">Selecione</option>
-            ${TIPOS_MANGA.map(m => `<option>${m}</option>`).join("")}
-          </select>
-        </div>
+        <div class="field"><label>Material</label>
+          <select name="material"><option value="">Selecione</option>${MATERIAIS.map(m=>`<option>${m}</option>`).join("")}</select></div>
+        <div class="field"><label>Comprimento</label>
+          <select name="tipo_comprimento"><option value="">Selecione</option>${COMPRIMENTOS.map(m=>`<option>${m}</option>`).join("")}</select></div>
+        <div class="field"><label>Tipo de manga</label>
+          <select name="tipo_manga"><option value="">Selecione</option>${MANGAS.map(m=>`<option>${m}</option>`).join("")}</select></div>
       </div>
-
       <div class="field-row">
-        <div class="field">
-          <label>Tipo de gola <span class="optional-tag">opcional</span></label>
-          <select name="tipo_gola">
-            <option value="">Selecione</option>
-            ${TIPOS_GOLA.map(m => `<option>${m}</option>`).join("")}
-          </select>
-        </div>
-        <div class="field">
-          <label>Tipo de vestido <span class="optional-tag">opcional</span></label>
-          <select name="tipo_vestido">
-            <option value="">Selecione</option>
-            ${TIPOS_VESTIDO.map(m => `<option>${m}</option>`).join("")}
-          </select>
-        </div>
-        <div class="field">
-          <label>Temporada <span class="optional-tag">opcional</span></label>
-          <select name="temporada">
-            <option value="">Selecione</option>
-            ${TEMPORADAS.map(m => `<option>${m}</option>`).join("")}
-          </select>
-        </div>
+        <div class="field"><label>Tipo de gola</label>
+          <select name="tipo_gola"><option value="">Selecione</option>${GOLAS.map(m=>`<option>${m}</option>`).join("")}</select></div>
+        <div class="field"><label>Tipo de vestido</label>
+          <select name="tipo_vestido"><option value="">Selecione</option>${TIPOS_V.map(m=>`<option>${m}</option>`).join("")}</select></div>
+        <div class="field"><label>Temporada</label>
+          <select name="temporada"><option value="">Selecione</option>${TEMPORADAS.map(m=>`<option>${m}</option>`).join("")}</select></div>
       </div>
-
       <div class="field-row">
-        <div class="field">
-          <label>Faixa etária <span class="optional-tag">opcional</span></label>
-          <select name="faixa_etaria">
-            <option value="">Selecione</option>
-            ${IDADES.map(m => `<option>${m}</option>`).join("")}
-          </select>
-        </div>
-        <div class="field">
-          <label>Apto para gestante <span class="optional-tag">opcional</span></label>
-          <select name="gestante">
-            <option value="">Selecione</option>
-            <option value="Sim">Sim</option>
-            <option value="Não">Não</option>
-          </select>
-        </div>
+        <div class="field"><label>Faixa etária</label>
+          <select name="faixa_etaria"><option value="">Selecione</option>${IDADES.map(m=>`<option>${m}</option>`).join("")}</select></div>
+        <div class="field"><label>Apto gestante</label>
+          <select name="gestante"><option value="">Selecione</option><option value="Sim">Sim</option><option value="Não">Não</option></select></div>
       </div>
-
       <div class="field">
-        <label>Ocasiões <span class="optional-tag">opcional · múltipla escolha</span></label>
-        <div id="chips-ocasioes-${idx}" class="chips-wrap"></div>
+        <label>Ocasiões</label>
+        <div id="chips-oc-${idx}"></div>
       </div>
-
       <div class="field">
-        <label>Estilos <span class="optional-tag">opcional · múltipla escolha</span></label>
-        <div id="chips-estilos-${idx}" class="chips-wrap"></div>
+        <label>Estilos</label>
+        <div id="chips-es-${idx}"></div>
       </div>
     </div>
 
-    <!-- ⑥  TÍTULO E DESCRIÇÃO -->
+    <!-- TÍTULO E DESCRIÇÃO -->
     <div class="section">
-      <div class="section-title"><span>📝</span> Título e descrição</div>
-
+      <div class="section-title">📝 Título e descrição</div>
       <div class="field">
-        <label>Título <span style="color:red">*</span> (máx. 60 caracteres)</label>
+        <label>Título <span class="req">*</span> (máx. 60 caracteres)</label>
         <div class="titulo-wrap">
           <input name="titulo" placeholder="Gerado automaticamente ou edite" maxlength="60" oninput="atualizarContador(this)">
           <span class="titulo-counter">0/60</span>
         </div>
       </div>
-
       <div class="field">
-        <label>Descrição <span class="optional-tag">opcional</span></label>
+        <label>Descrição <span class="opt-tag">opcional</span></label>
         <textarea name="descricao" placeholder="Detalhe o produto: tecido, caimento, cuidados, etc."></textarea>
       </div>
     </div>
 
-    <!-- ⑦  PREÇO, ESTOQUE, SKU, GARANTIA -->
+    <!-- PREÇO, ESTOQUE, FRETE, SKU, GARANTIA -->
     <div class="section">
-      <div class="section-title"><span>💰</span> Preço e estoque</div>
-
+      <div class="section-title">💰 Preço e estoque</div>
       <div class="field-row">
-        <div class="field">
-          <label>Preço <span style="color:red">*</span></label>
-          <input name="preco" placeholder="R$ 0,00" oninput="formatarPreco(this)">
-        </div>
-        <div class="field">
-          <label>Estoque (qtd) <span style="color:red">*</span></label>
-          <input name="quantidade" type="number" min="1" value="10" placeholder="10">
-        </div>
-        <div class="field">
-          <label>SKU <span class="optional-tag">opcional</span></label>
-          <input name="sku" placeholder="Código interno do produto">
-        </div>
-        <div class="field">
-          <label>Garantia <span class="optional-tag">opcional</span></label>
-          <input name="garantia" placeholder="ex: 30 dias garantia de fábrica">
-        </div>
+        <div class="field"><label>Preço <span class="req">*</span></label><input name="preco" placeholder="R$ 0,00" oninput="formatarPreco(this)"></div>
+        <div class="field"><label>Estoque <span class="req">*</span></label><input name="quantidade" type="number" min="1" value="10" placeholder="10"></div>
+        <div class="field"><label>SKU <span class="opt-tag">opcional</span></label><input name="sku" placeholder="Código interno"></div>
+        <div class="field"><label>Garantia <span class="opt-tag">opcional</span></label><input name="garantia" placeholder="ex: 30 dias"></div>
       </div>
+      <!-- FRETE GRÁTIS -->
+      <label class="switch-row" style="cursor:pointer;margin-top:6px">
+        <span class="switch">
+          <input type="checkbox" name="frete_gratis">
+          <span class="slider"></span>
+        </span>
+        <span class="switch-label">🚚 Oferecer frete grátis</span>
+      </label>
     </div>
 
-    <!-- ⑧  DIMENSÕES E PESO -->
+    <!-- DIMENSÕES E PESO -->
     <div class="section">
-      <div class="section-title"><span>📦</span> Dimensões e peso <span class="optional-tag" style="font-size:10px;letter-spacing:0">opcional</span></div>
+      <div class="section-title">📦 Dimensões e peso <span class="opt-tag" style="font-size:9px">todos opcionais</span></div>
       <div class="field-row">
-        <div class="field">
-          <label>Peso (kg)</label>
-          <input name="peso_kg" type="number" step="0.01" placeholder="ex: 0.5">
-        </div>
-        <div class="field">
-          <label>Largura (cm)</label>
-          <input name="largura_cm" type="number" placeholder="ex: 30">
-        </div>
-        <div class="field">
-          <label>Altura (cm)</label>
-          <input name="altura_cm" type="number" placeholder="ex: 10">
-        </div>
-        <div class="field">
-          <label>Profundidade (cm)</label>
-          <input name="profundidade_cm" type="number" placeholder="ex: 5">
-        </div>
+        <div class="field"><label>Peso (kg)</label><input name="peso_kg" type="number" step="0.01" placeholder="ex: 0.3"></div>
+        <div class="field"><label>Largura (cm)</label><input name="largura_cm" type="number" placeholder="ex: 30"></div>
+        <div class="field"><label>Altura (cm)</label><input name="altura_cm" type="number" placeholder="ex: 10"></div>
+        <div class="field"><label>Profundidade (cm)</label><input name="profundidade_cm" type="number" placeholder="ex: 5"></div>
       </div>
     </div>
   `;
 
   document.getElementById("formArea").appendChild(div);
   atualizarNumeracao();
-
-  // Montar chips
-  buildChips(div.querySelector(`#chips-ocasioes-${idx}`), OCASIOES, "ocasioes");
-  buildChips(div.querySelector(`#chips-estilos-${idx}`),  ESTILOS,  "estilos");
+  buildChips(div.querySelector(`#chips-oc-${idx}`), OCASIOES, "ocasioes");
+  buildChips(div.querySelector(`#chips-es-${idx}`), ESTILOS,  "estilos");
 }
 
 addForm();
 
-// ─── MONTAR EXTRA_ATTRIBUTES ──────────────────────────────────────────────
+// ── MONTAR EXTRA_ATTRIBUTES ────────────────────────────────────────────────
 function montarExtras(card) {
   const g = n => { const e = card.querySelector(`[name="${n}"]`); return e ? e.value.trim() : ""; };
   const extras = [];
-
   const maybe = (id, val) => { if (val) extras.push({ id, value_name: val }); };
 
-  maybe("MAIN_MATERIAL",       g("material"));
-  maybe("LENGTH_TYPE",         g("tipo_comprimento"));
-  maybe("SLEEVE_TYPE",         g("tipo_manga"));
-  maybe("COLLAR_TYPE",         g("tipo_gola"));
-  maybe("DRESS_TYPE",          g("tipo_vestido"));
-  maybe("LAUNCH_SEASON",       g("temporada"));
-  maybe("AGE_GROUP",           g("faixa_etaria"));
-  maybe("IS_FOR_PREGNANT",     g("gestante"));
+  maybe("MAIN_MATERIAL",   g("material"));
+  maybe("LENGTH_TYPE",     g("tipo_comprimento"));
+  maybe("SLEEVE_TYPE",     g("tipo_manga"));
+  maybe("COLLAR_TYPE",     g("tipo_gola"));
+  maybe("DRESS_TYPE",      g("tipo_vestido"));
+  maybe("LAUNCH_SEASON",   g("temporada"));
+  maybe("AGE_GROUP",       g("faixa_etaria"));
+  maybe("IS_FOR_PREGNANT", g("gestante"));
 
-  // Multi-value (cada ocasião/estilo = atributo separado com mesmo id)
-  const ocasioes = getChips(card, "ocasioes");
-  if (ocasioes.length > 0) {
-    extras.push({ id: "OCCASION", value_name: ocasioes.join(", ") });
-  }
-  const estilos = getChips(card, "estilos");
-  if (estilos.length > 0) {
-    extras.push({ id: "STYLE", value_name: estilos.join(", ") });
-  }
+  const oc = getChips(card, "ocasioes");
+  if (oc.length) extras.push({ id: "OCCASION", value_name: oc.join(", ") });
+
+  const es = getChips(card, "estilos");
+  if (es.length) extras.push({ id: "STYLE", value_name: es.join(", ") });
 
   return extras;
 }
 
-// ─── PUBLICAR ─────────────────────────────────────────────────────────────
+// ── PUBLICAR ──────────────────────────────────────────────────────────────
 async function publicar() {
   const btn = document.getElementById("btnPublish");
   btn.disabled = true;
@@ -581,39 +551,41 @@ async function publicar() {
 
   for (const card of cards) {
     const title    = get(card, "titulo");
-    const precoRaw = get(card, "preco").replace(/\D/g, "");
-    const preco    = precoRaw ? parseInt(precoRaw) / 100 : 0;
+    const precoRaw = get(card, "preco").replace(/\D/g,"");
+    const preco    = precoRaw ? parseInt(precoRaw)/100 : 0;
     const imagens  = ["img1","img2","img3","img4"].map(n => get(card,n)).filter(Boolean);
-    const qtd      = parseInt(get(card, "quantidade")) || 10;
+    const qtd      = parseInt(get(card,"quantidade")) || 10;
+    const freteEl  = card.querySelector('[name="frete_gratis"]');
 
-    // Validação obrigatórios
-    if (!title) { showAlert("Preencha o título do anúncio", "error"); btn.disabled=false; btn.innerHTML="Publicar tudo"; return; }
-    if (!preco)  { showAlert("Preencha o preço do anúncio", "error"); btn.disabled=false; btn.innerHTML="Publicar tudo"; return; }
+    if (!title)          { showAlert("Preencha o título",          "error"); btn.disabled=false; btn.innerHTML="Publicar tudo"; return; }
+    if (!preco)          { showAlert("Preencha o preço",           "error"); btn.disabled=false; btn.innerHTML="Publicar tudo"; return; }
     if (!imagens.length) { showAlert("Adicione ao menos 1 imagem", "error"); btn.disabled=false; btn.innerHTML="Publicar tudo"; return; }
-    if (!get(card,"marca"))   { showAlert("Preencha a marca", "error"); btn.disabled=false; btn.innerHTML="Publicar tudo"; return; }
-    if (!get(card,"cor"))     { showAlert("Selecione a cor", "error"); btn.disabled=false; btn.innerHTML="Publicar tudo"; return; }
-    if (!get(card,"tamanho")) { showAlert("Selecione o tamanho", "error"); btn.disabled=false; btn.innerHTML="Publicar tudo"; return; }
+    if (!get(card,"marca"))   { showAlert("Preencha a marca",   "error"); btn.disabled=false; btn.innerHTML="Publicar tudo"; return; }
+    if (!get(card,"cor"))     { showAlert("Selecione a cor",    "error"); btn.disabled=false; btn.innerHTML="Publicar tudo"; return; }
+    if (!get(card,"tamanho")) { showAlert("Selecione o tamanho","error"); btn.disabled=false; btn.innerHTML="Publicar tudo"; return; }
     if (!get(card,"sexo"))    { showAlert("Selecione o gênero", "error"); btn.disabled=false; btn.innerHTML="Publicar tudo"; return; }
 
     produtos.push({
       title,
-      description:      get(card, "descricao"),
-      category_id:      get(card, "categoria"),
-      listing_type:     get(card, "listing_type") || "gold_special",
+      description:      get(card,"descricao"),
+      category_id:      get(card,"categoria"),
+      listing_type:     get(card,"listing_type") || "gold_special",
+      condition:        get(card,"condition")    || "new",
       price:            preco,
       quantidade:       qtd,
+      frete_gratis:     freteEl ? freteEl.checked : false,
       pictures:         imagens,
-      marca:            get(card, "marca"),
-      modelo:           get(card, "modelo"),
-      cor:              get(card, "cor"),
-      sexo:             get(card, "sexo"),
-      tamanho:          get(card, "tamanho"),
-      sku:              get(card, "sku"),
-      garantia:         get(card, "garantia"),
-      peso_kg:          get(card, "peso_kg"),
-      largura_cm:       get(card, "largura_cm"),
-      altura_cm:        get(card, "altura_cm"),
-      profundidade_cm:  get(card, "profundidade_cm"),
+      marca:            get(card,"marca"),
+      modelo:           get(card,"modelo"),
+      cor:              get(card,"cor"),
+      sexo:             get(card,"sexo"),
+      tamanho:          get(card,"tamanho"),
+      sku:              get(card,"sku"),
+      garantia:         get(card,"garantia"),
+      peso_kg:          get(card,"peso_kg"),
+      largura_cm:       get(card,"largura_cm"),
+      altura_cm:        get(card,"altura_cm"),
+      profundidade_cm:  get(card,"profundidade_cm"),
       extra_attributes: montarExtras(card)
     });
   }
@@ -621,7 +593,7 @@ async function publicar() {
   try {
     const res  = await fetch("/api/create-items", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type":"application/json" },
       body: JSON.stringify({ produtos, token })
     });
     const data = await res.json();
@@ -634,14 +606,13 @@ async function publicar() {
 
   } catch (err) {
     showAlert("Erro de conexão: " + err.message, "error");
-    console.error(err);
   }
 
   btn.disabled = false;
   btn.innerHTML = "Publicar tudo";
 }
 
-// ─── RENDERIZAR RESULTADOS ────────────────────────────────────────────────
+// ── RENDERIZAR RESULTADOS ─────────────────────────────────────────────────
 function renderResultados(data) {
   const area = document.getElementById("resultArea");
   area.innerHTML = "";
@@ -660,33 +631,73 @@ function renderResultados(data) {
 
     if (r.sucesso) {
       row.innerHTML = `
-        <span>✔</span>
+        <span style="font-size:18px">✔</span>
         <div>
           <b>${r.produto}</b> — ID: ${r.id}
-          ${r.link ? `<br><a class="result-link" href="${r.link}" target="_blank">🔗 Ver anúncio no ML</a>` : ""}
+          ${r.link ? `<br><a class="result-link" href="${r.link}" target="_blank">🔗 Ver anúncio no Mercado Livre</a>` : ""}
         </div>`;
     } else {
-      let detalhe = "";
-      if (r.detalhe && typeof r.detalhe === "object") {
-        if (Array.isArray(r.detalhe.cause) && r.detalhe.cause.length > 0) {
-          detalhe = r.detalhe.cause.map(c => `• ${c.message || c.code || JSON.stringify(c)}`).join("<br>");
-        } else {
-          detalhe = r.detalhe.message || JSON.stringify(r.detalhe, null, 2);
-        }
+      // Causas em PORTUGUÊS
+      let causas = [];
+      const det = r.detalhe || {};
+
+      if (Array.isArray(det.cause_pt) && det.cause_pt.length > 0) {
+        causas = det.cause_pt.map(c => c.message_pt || c.message || JSON.stringify(c));
+      } else if (Array.isArray(det.cause) && det.cause.length > 0) {
+        causas = det.cause.map(c => traduzirTexto(c.message || c.code || JSON.stringify(c)));
+      } else if (det.message) {
+        causas = [traduzirTexto(det.message)];
+      } else if (typeof r.detalhe === "string") {
+        causas = [traduzirTexto(r.detalhe)];
       } else {
-        detalhe = String(r.detalhe || "");
+        causas = [traduzirTexto(JSON.stringify(det))];
       }
+
+      const causaHtml = causas.map(c => `• ${c}`).join("<br>");
+
+      // Debug raw
+      const rawJson = JSON.stringify(det, null, 2);
+      const debugId = `debug-${Math.random().toString(36).substr(2,6)}`;
+
       row.innerHTML = `
-        <span>✖</span>
+        <span style="font-size:18px">✖</span>
         <div style="flex:1">
           <b>${r.produto}</b>
-          <div class="result-cause">${detalhe}</div>
+          <div class="result-cause">${causaHtml}</div>
+          <span class="debug-toggle" onclick="document.getElementById('${debugId}').style.display = document.getElementById('${debugId}').style.display==='none'?'block':'none'">
+            ▸ ver resposta completa da ML
+          </span>
+          <pre class="debug-box" id="${debugId}">${rawJson}</pre>
         </div>`;
     }
     area.appendChild(row);
   });
 
   area.scrollIntoView({ behavior: "smooth" });
+}
+
+// ── TRADUÇÃO LOCAL (igual ao backend) ─────────────────────────────────────
+function traduzirTexto(texto) {
+  if (!texto) return texto;
+  const TRAD = {
+    "family_name": "Campo 'family_name' obrigatório quando há variations",
+    "price": "Preço ausente dentro de variations",
+    "available_quantity": "Quantidade em estoque ausente dentro de variations",
+    "The field variations is invalid": "O campo variations está inválido",
+    "The body does not contains": "Body não contém campo(s) obrigatório(s)",
+    "item variation with errors": "Variação do item com erros",
+    "invalid_body": "Body da requisição inválido",
+    "missing_field": "Campo obrigatório ausente",
+    "invalid_field": "Campo com valor inválido",
+    "not found": "Recurso não encontrado",
+    "unauthorized": "Token inválido ou expirado",
+    "invalid pictures": "URL de imagem inválida",
+    "The resource is not reachable": "Imagem inacessível — verifique o link"
+  };
+  for (const [en, pt] of Object.entries(TRAD)) {
+    if (texto.toLowerCase().includes(en.toLowerCase())) return pt;
+  }
+  return texto;
 }
 </script>
 </body>
