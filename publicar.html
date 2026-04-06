@@ -659,7 +659,7 @@ function renderResultados(data) {
           ${r.link ? `<br><a class="rl" href="${r.link}" target="_blank">🔗 Ver anúncio no Mercado Livre</a>` : ""}
         </div>`;
     } else {
-      const det = r.mlData || {};
+      const det = r.detalhe || {};
       let causas = [];
 
       if (Array.isArray(det.cause) && det.cause.length > 0) {
