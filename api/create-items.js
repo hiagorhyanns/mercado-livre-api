@@ -9,16 +9,14 @@ export default async function handler(req, res) {
   if (req.method !== "POST")   return res.status(405).json({ error: "Método não permitido" });
 
   try {
-    // Parsing robusto do body
     let body = req.body;
     if (typeof body === "string") {
       try { body = JSON.parse(body); } catch(e) {
         return res.status(400).json({ error: "Body não é JSON válido" });
       }
     }
-    if (!body || typeof body !== "object") {
+    if (!body || typeof body !== "object")
       return res.status(400).json({ error: "Body vazio" });
-    }
 
     const { produtos, token } = body;
 
@@ -27,11 +25,7 @@ export default async function handler(req, res) {
     if (!token)
       return res.status(400).json({ error: "Token ausente" });
 
-    // Verifica se o token parece válido antes de enviar para ML
     const tokenStr = String(token).trim();
-    if (tokenStr.length < 20) {
-      return res.status(400).json({ error: `Token inválido (length: ${tokenStr.length}) — reconecte sua conta` });
-    }
 
     const results = [];
 
@@ -57,8 +51,14 @@ export default async function handler(req, res) {
           .filter(u => typeof u === "string" && u.startsWith("http"))
           .map(u => ({ source: u }));
 
+        // ─────────────────────────────────────────────────────────────────────
+        // COLOR e SIZE vão em attributes (sem variations).
+        // price e available_quantity ficam na RAIZ do body.
+        // Essa é a estrutura correta para item simples (1 cor / 1 tamanho).
+        // ─────────────────────────────────────────────────────────────────────
         const attributes = [];
         const add = (id, val) => { if (val) attributes.push({ id, value_name: String(val) }); };
+
         add("BRAND",           p.marca);
         add("GENDER",          p.sexo);
         add("MODEL",           p.modelo);
@@ -84,34 +84,32 @@ export default async function handler(req, res) {
           };
         }
 
+        // ─────────────────────────────────────────────────────────────────────
+        // SEM variations / SEM family_name
+        // price e available_quantity na RAIZ
+        // ─────────────────────────────────────────────────────────────────────
         const mlBody = {
-          title:           p.title,
-          category_id:     p.category_id,
-          currency_id:     "BRL",
-          buying_mode:     "buy_it_now",
-          listing_type_id: p.listing_type || "gold_special",
-          condition:       p.condition    || "new",
+          title:              p.title,
+          category_id:        p.category_id,
+          price:              Number(p.price),              // ← RAIZ
+          currency_id:        "BRL",
+          available_quantity: Number(p.quantidade) > 0
+                                ? Number(p.quantidade)
+                                : 10,                       // ← RAIZ
+          buying_mode:        "buy_it_now",
+          listing_type_id:    p.listing_type || "gold_special",
+          condition:          p.condition    || "new",
           pictures,
           shipping,
           attributes,
-          family_name:     p.title,
-          variations: [{
-            attribute_combinations: [
-              { id: "COLOR", value_name: String(p.cor)     },
-              { id: "SIZE",  value_name: String(p.tamanho) }
-            ],
-            price:              Number(p.price),
-            available_quantity: Number(p.quantidade) > 0 ? Number(p.quantidade) : 10,
-            ...(p.sku ? { seller_custom_field: String(p.sku) } : {})
-          }],
-          ...(p.garantia ? { warranty: p.garantia } : {})
+          ...(p.garantia ? { warranty: p.garantia } : {}),
+          ...(p.sku      ? { seller_custom_field: String(p.sku) } : {})
         };
 
         console.log("=== PRODUTO:", p.title);
-        console.log("=== TOKEN (primeiros 20 chars):", tokenStr.substring(0, 20));
         console.log("=== BODY:", JSON.stringify(mlBody));
 
-        const mlRes = await fetch("https://api.mercadolibre.com/items", {
+        const mlRes  = await fetch("https://api.mercadolibre.com/items", {
           method:  "POST",
           headers: {
             "Authorization": `Bearer ${tokenStr}`,
@@ -121,21 +119,19 @@ export default async function handler(req, res) {
           body: JSON.stringify(mlBody)
         });
 
-        // Ler body como texto primeiro para garantir que não é vazio
         const mlText = await mlRes.text();
         console.log("=== ML STATUS:", mlRes.status);
-        console.log("=== ML BODY TEXT:", mlText);
+        console.log("=== ML RESP:", mlText);
 
         let mlData = {};
         try { mlData = JSON.parse(mlText); } catch(e) {
-          mlData = { message: `ML retornou resposta não-JSON: ${mlText}`, cause: [] };
+          mlData = { message: `Resposta não-JSON: ${mlText}`, cause: [] };
         }
 
         if (!mlRes.ok || mlData.error) {
           results.push({
-            erro:   true,
-            titulo: p.title,
-            // ← status HTTP agora visível no frontend
+            erro:    true,
+            titulo:  p.title,
             detalhe: {
               http_status: mlRes.status,
               ...mlData,
@@ -145,7 +141,7 @@ export default async function handler(req, res) {
           continue;
         }
 
-        // Descrição separada
+        // Descrição — endpoint separado da ML
         if (p.descricao?.trim()) {
           await fetch(`https://api.mercadolibre.com/items/${mlData.id}/description`, {
             method:  "POST",
@@ -154,13 +150,18 @@ export default async function handler(req, res) {
           }).catch(() => {});
         }
 
-        results.push({ sucesso: true, titulo: p.title, id: mlData.id, link: mlData.permalink });
+        results.push({
+          sucesso: true,
+          titulo:  p.title,
+          id:      mlData.id,
+          link:    mlData.permalink
+        });
 
       } catch (err) {
-        console.error("=== ERRO INTERNO:", err);
+        console.error("ERRO INTERNO:", err);
         results.push({
-          erro:   true,
-          titulo: p.title,
+          erro:    true,
+          titulo:  p.title,
           detalhe: { message: err.toString(), cause: [] }
         });
       }
@@ -169,7 +170,7 @@ export default async function handler(req, res) {
     return res.json(results);
 
   } catch (err) {
-    console.error("=== ERRO GERAL:", err);
+    console.error("ERRO GERAL:", err);
     return res.status(500).json({ erro: true, detalhe: { message: err.toString() } });
   }
 }
