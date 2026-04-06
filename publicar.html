@@ -309,7 +309,7 @@ function addForm() {
         <label>Cor <span class="req">*</span></label>
         <select name="cor" onchange="gerarTitulo(this.closest('.card'))">
           <option value="">Selecione</option>
-          <option>Preto</option><option>Branco</option><option>Vermelho</option>
+          <option>Preto</option><option>Branco</option><option selected>Vermelho</option>
           <option>Azul</option><option>Rosa</option><option>Verde</option>
           <option>Amarelo</option><option>Roxo</option><option>Laranja</option>
           <option>Cinza</option><option>Bege</option><option>Marrom</option>
@@ -321,7 +321,7 @@ function addForm() {
         <label>Gênero <span class="req">*</span></label>
         <select name="sexo" onchange="gerarTitulo(this.closest('.card'))">
           <option value="">Selecione</option>
-          <option value="Feminino">Feminino</option>
+          <option value="Feminino" selected>Feminino</option>
           <option value="Masculino">Masculino</option>
           <option value="Unissex">Unissex</option>
         </select>
@@ -336,7 +336,7 @@ function addForm() {
             <option>46</option><option>48</option><option>50</option>
           </optgroup>
           <optgroup label="Letras">
-            <option>PP</option><option>P</option><option>M</option>
+            <option>PP</option><option>P</option><option selected>M</option>
             <option>G</option><option>GG</option><option>XGG</option>
           </optgroup>
           <option>Único</option>
@@ -561,10 +561,10 @@ async function publicar() {
     const erro = validar(card);
     if (erro) { showAlert(erro,"er"); btn.disabled=false; btn.innerHTML="Publicar tudo"; return; }
 
-    // Coleta dados do card
     const g = n => { const e=card.querySelector(`[name="${n}"]`); return e?e.value.trim():""; };
     const precoRaw = g("preco").replace(/\D/g,"");
     const freteEl  = card.querySelector('[name="frete_gratis"]');
+
     produtos.push({
       title:           g("titulo"),
       descricao:       g("descricao"),
@@ -605,12 +605,28 @@ async function publicar() {
       headers: { "Content-Type": "application/json" },
       body:    JSON.stringify({ produtos, token })
     });
-    const data = await res.json();
+
+    let data;
+    try {
+      data = await res.json();
+    } catch(e) {
+      const txt = await res.text().catch(()=>"(sem body)");
+      showAlert("Resposta inválida do servidor: "+txt.substring(0,100),"er");
+      btn.disabled=false; btn.innerHTML="Publicar tudo"; return;
+    }
+
     console.log("Resposta /api/create-items:", data);
+
+    if (!Array.isArray(data)) {
+      showAlert("Erro no servidor: "+(data.error||JSON.stringify(data)),"er");
+      btn.disabled=false; btn.innerHTML="Publicar tudo"; return;
+    }
+
     renderResultados(data);
-    const erros = data.filter(r => r.erro).length;
+    const erros = data.filter(r=>r.erro).length;
     if (!erros) showAlert(`✅ ${data.length} anúncio(s) publicado(s) com sucesso!`,"ok");
     else        showAlert(`⚠️ ${erros} erro(s) — veja detalhes acima`,"er");
+
   } catch(err) {
     showAlert("Erro ao chamar /api/create-items: "+err.message,"er");
     console.error(err);
