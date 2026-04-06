@@ -2,91 +2,33 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-
 <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/hiagorhyanns/mercado-livre-api/29a8c4b095c3e39ee5ecf28f0e4be283621d5f61/img/conectado-ml.png">
-
 <title>::. Conectado. ::. ON ::.</title>
-
 <style>
-body {
-  margin:0;
-  font-family: Inter, Helvetica;
-  background:#ededed;
-}
-.container {
-  display:flex;
-  width:100%;
-  height:100vh;
-  justify-content:center;
-  align-items:center;
-}
-.card {
-  background:white;
-  width:420px;
-  padding:30px;
-  border-radius:10px;
-  box-shadow:0 4px 20px rgba(0,0,0,0.1);
-}
-.card p,
-.card textarea,
-.card input {
-  color:#333;
-}
-.token {
-  font-size:14px;
-  border:0;
-  width:100%;
-  height:80px;
-}
+body { margin:0; font-family: Inter, Helvetica; background:#ededed; }
+.container { display:flex; width:100%; height:100vh; justify-content:center; align-items:center; }
+.card { background:white; width:420px; padding:30px; border-radius:10px; box-shadow:0 4px 20px rgba(0,0,0,0.1); }
+.card p, .card textarea, .card input { color:#333; }
+.token { font-size:14px; border:0; width:100%; height:80px; }
 .alert {
-  position:fixed;
-  top:20px;
-  left:50%;
-  transform:translateX(-50%);
-  background:#00a650;
-  color:white;
-  padding:15px 25px;
-  border-radius:6px;
-  font-weight:bold;
-  display:flex;
-  align-items:center;
-  gap:10px;
+  position:fixed; top:20px; left:50%; transform:translateX(-50%);
+  background:#00a650; color:white; padding:15px 25px; border-radius:6px;
+  font-weight:bold; display:flex; align-items:center; gap:10px;
   animation:fadeOut 4s forwards;
 }
-@keyframes fadeOut {
-  0% {opacity:1;}
-  80% {opacity:1;}
-  100% {opacity:0; display:none;}
-}
-input#tg {
-  width:100%;
-  border:0;
-  font-size:14px;
-}
-span#user {
-  font-size:14px;
-  display:block;
-  padding:10px 0;
-}
+@keyframes fadeOut { 0%{opacity:1} 80%{opacity:1} 100%{opacity:0} }
+input#tg { width:100%; border:0; font-size:14px; }
+span#user { font-size:14px; display:block; padding:10px 0; }
 .btn-publicar {
-  padding:15px 25px;
-  border:none;
-  border-radius:6px;
-  background:#3483fa;
-  color:white;
-  font-weight:600;
-  cursor:pointer;
-  font-family: Inter;
+  padding:15px 25px; border:none; border-radius:6px;
+  background:#3483fa; color:white; font-weight:600; cursor:pointer; font-family:Inter;
 }
-.btn-publicar:hover {
-  background:#2968c8;
-}
+.btn-publicar:hover { background:#2968c8; }
 </style>
 </head>
-
 <body>
+
 <div class="alert">
   <img width="30px" src="https://marketplace.canva.com/44VpY/MAFJGS44VpY/1/tl/canva-green-ok-tick-approval-MAFJGS44VpY.png"/>
   Sua API foi conectada (6h)
@@ -94,39 +36,29 @@ span#user {
 
 <div class="container">
   <div class="card">
-
     <p><b>Usuário</b> <span id="user"></span></p>
-
     <p><b>Tag</b></p>
     <input id="tg" readonly>
-
     <p><b>Token</b></p>
     <textarea class="token" id="token"></textarea>
-
-    <!-- BOTÃO -->
-    <button class="btn-publicar" onclick="irPublicar()">
-      Publicar
-    </button>
-
+    <button class="btn-publicar" onclick="irPublicar()">Publicar</button>
   </div>
 </div>
 
 <script>
 const params = new URLSearchParams(window.location.search);
+const user   = params.get("user");
+const token  = params.get("token");
+const tg     = params.get("tg");
 
-const user = params.get("user");
-const token = params.get("token");
-const tg = params.get("tg");
+document.getElementById("user").innerText  = user;
+document.getElementById("token").value     = token;
+document.getElementById("tg").value        = tg;
 
-document.getElementById("user").innerText = user;
-document.getElementById("token").value = token;
-document.getElementById("tg").value = tg;
-
-// REDIRECIONAR PARA TELA DE PUBLICAÇÃO
-function irPublicar(){
-  window.location.href = `/publicar.html?token=${token}`;
+function irPublicar() {
+  // ✅ encodeURIComponent garante que o token chegue íntegro mesmo com caracteres especiais
+  window.location.href = `/publicar.html?token=${encodeURIComponent(token)}`;
 }
 </script>
-
 </body>
 </html>
