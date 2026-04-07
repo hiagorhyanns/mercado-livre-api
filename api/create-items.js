@@ -63,10 +63,11 @@ export default async function handler(req, res) {
           };
         }
 
-        // ✅ CORREÇÃO: family_name obrigatório para categorias de vestuário
+        // ✅ Para categorias de vestuário (MLB1430 etc):
+        // - NÃO enviar "title" na raiz
+        // - Usar "family_name" como identificador do grupo
         const mlBody = {
-          title:              p.title,
-          family_name:        p.title,   // ← obrigatório para MLB1430 e similares
+          family_name:        p.title,
           category_id:        p.category_id || "MLB1430",
           price:              Number(p.price),
           currency_id:        "BRL",
