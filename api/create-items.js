@@ -65,34 +65,29 @@ export default async function handler(req, res) {
           };
         }
 
-        /*
-         * ESTRUTURA FINAL CORRETA para MLB1430 (Vestidos) e similares:
-         *
-         *  family_name         → RAIZ (obrigatório pela categoria)
-         *  price               → RAIZ
-         *  available_quantity  → RAIZ
-         *  COLOR + SIZE        → em attributes (NÃO em variations)
-         *
-         *  SEM variations / SEM attribute_combinations no body
-         */
+        // family_name deve ser DIFERENTE do title
+        // Usamos marca + categoria como family_name
+        const familyName = `${p.marca} ${p.categoria_nome || "Vestido"}`.substring(0, 60);
+
         const mlBody = {
           title:              p.title,
           category_id:        p.category_id || "MLB1430",
-          family_name:        p.title,                           // OBRIGATORIO na raiz
-          price:              Number(p.price),                   // RAIZ
+          family_name:        familyName,
+          price:              Number(p.price),
           currency_id:        "BRL",
-          available_quantity: Number(p.quantidade) > 0 ? Number(p.quantidade) : 10,  // RAIZ
+          available_quantity: Number(p.quantidade) > 0 ? Number(p.quantidade) : 10,
           buying_mode:        "buy_it_now",
           listing_type_id:    p.listing_type || "gold_special",
           condition:          p.condition    || "new",
           pictures,
           shipping,
           attributes,
-          ...(p.garantia ? { warranty: p.garantia }            : {}),
+          ...(p.garantia ? { warranty: p.garantia }             : {}),
           ...(p.sku      ? { seller_custom_field: String(p.sku) } : {})
         };
 
         console.log("PRODUTO:", p.title);
+        console.log("FAMILY:", familyName);
         console.log("BODY:", JSON.stringify(mlBody));
 
         const mlRes  = await fetch("https://api.mercadolibre.com/items", {
