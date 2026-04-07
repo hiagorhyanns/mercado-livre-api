@@ -54,21 +54,25 @@ export default async function handler(req, res) {
         add("OCCASION",        p.ocasioes);
         add("STYLE",           p.estilos);
 
+        // Shipping: só adiciona dimensions se valores forem válidos (mín 20cm cada)
         const shipping = { mode: "me2", free_shipping: p.frete_gratis === true };
-        if (p.peso_kg && p.largura_cm && p.altura_cm && p.profundidade_cm) {
+        const dimW = Number(p.largura_cm);
+        const dimH = Number(p.altura_cm);
+        const dimL = Number(p.profundidade_cm);
+        if (dimW >= 20 && dimH >= 20 && dimL >= 20) {
           shipping.dimensions = {
-            width:  { value: Number(p.largura_cm),      unit: "cm" },
-            height: { value: Number(p.altura_cm),       unit: "cm" },
-            length: { value: Number(p.profundidade_cm), unit: "cm" }
+            width:  { value: dimW, unit: "cm" },
+            height: { value: dimH, unit: "cm" },
+            length: { value: dimL, unit: "cm" }
           };
         }
 
-        // ✅ Para categorias de vestuário (MLB1430 etc):
-        // - NÃO enviar "title" na raiz
-        // - Usar "family_name" como identificador do grupo
+        // ✅ Para categorias de vestuário:
+        // - NÃO enviar "title" na raiz, usar "family_name"
+        // - MLB1430 é pai — usar MLB1269551 (Vestidos Femininos) como leaf
         const mlBody = {
           family_name:        p.title,
-          category_id:        p.category_id || "MLB1430",
+          category_id:        p.category_id || "MLB1269551",
           price:              Number(p.price),
           currency_id:        "BRL",
           available_quantity: Number(p.quantidade) > 0 ? Number(p.quantidade) : 10,
