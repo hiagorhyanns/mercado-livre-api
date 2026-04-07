@@ -189,11 +189,7 @@ function fmtPreco(inp) {
 }
 
 function gerarTitulo(card) {
-  const g = n => { const e = card.querySelector(`[name="${n}"]`); return e ? e.value.trim() : ""; };
-  const t = [g("produto"),g("modelo"),g("marca"),g("cor"),g("sexo")]
-    .filter(Boolean).join(" ").substring(0, 60);
-  const inp = card.querySelector('[name="titulo"]');
-  inp.value = t; updCount(inp);
+  // auto-preenchimento desativado — usuário preenche o título manualmente
 }
 function updCount(inp) {
   const c = inp.closest(".tw")?.querySelector(".tc");
@@ -298,16 +294,16 @@ function addForm() {
     <div class="sec-title">👗 Dados do produto</div>
     <div class="row">
       <div class="f"><label>Produto <span class="req">*</span></label>
-        <input name="produto" placeholder="ex: Vestido" oninput="gerarTitulo(this.closest('.card'))"></div>
+        <input name="produto" placeholder="ex: Vestido"></div>
       <div class="f"><label>Modelo <span class="opt">opcional</span></label>
-        <input name="modelo" placeholder="ex: Floral Longo" oninput="gerarTitulo(this.closest('.card'))"></div>
+        <input name="modelo" placeholder="ex: Floral Longo"></div>
       <div class="f"><label>Marca <span class="req">*</span></label>
-        <input name="marca" placeholder="ex: Zara" oninput="gerarTitulo(this.closest('.card'))"></div>
+        <input name="marca" placeholder="ex: Zara"></div>
     </div>
     <div class="row">
       <div class="f">
         <label>Cor <span class="req">*</span></label>
-        <select name="cor" onchange="gerarTitulo(this.closest('.card'))">
+        <select name="cor">
           <option value="">Selecione</option>
           <option>Preto</option><option>Branco</option><option selected>Vermelho</option>
           <option>Azul</option><option>Rosa</option><option>Verde</option>
@@ -319,7 +315,7 @@ function addForm() {
       </div>
       <div class="f">
         <label>Gênero <span class="req">*</span></label>
-        <select name="sexo" onchange="gerarTitulo(this.closest('.card'))">
+        <select name="sexo">
           <option value="">Selecione</option>
           <option value="Feminino" selected>Feminino</option>
           <option value="Masculino">Masculino</option>
@@ -600,7 +596,7 @@ async function publicar() {
   }
 
   try {
-    const res  = await fetch("/api/create-items", {
+    const res  = await fetch("/create-items", {
       method:  "POST",
       headers: { "Content-Type": "application/json" },
       body:    JSON.stringify({ produtos, token })
@@ -615,7 +611,7 @@ async function publicar() {
       btn.disabled=false; btn.innerHTML="Publicar tudo"; return;
     }
 
-    console.log("Resposta /api/create-items:", data);
+    console.log("Resposta /create-items:", data);
 
     if (!Array.isArray(data)) {
       showAlert("Erro no servidor: "+(data.error||JSON.stringify(data)),"er");
@@ -628,7 +624,7 @@ async function publicar() {
     else        showAlert(`⚠️ ${erros} erro(s) — veja detalhes acima`,"er");
 
   } catch(err) {
-    showAlert("Erro ao chamar /api/create-items: "+err.message,"er");
+    showAlert("Erro ao chamar /create-items: "+err.message,"er");
     console.error(err);
   }
 
