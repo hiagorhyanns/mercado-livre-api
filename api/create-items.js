@@ -38,11 +38,28 @@ export default async function handler(req, res) {
 
         const attributes = [];
         const add = (id, val) => { if (val) attributes.push({ id, value_name: String(val) }); };
+
+        // Mapa de categoria → grade de tamanhos do ML (SIZE_GRID_ID)
+        const SIZE_GRID_MAP = {
+          "MLB108704":  "MLB-WOMEN-CLOTHES-SIZE-GRID-ID",  // Vestidos Femininos
+          "MLB1271102": "MLB-WOMEN-CLOTHES-SIZE-GRID-ID",  // Blusas Femininas
+          "MLB1292":    "MLB-WOMEN-CLOTHES-SIZE-GRID-ID",  // Calças Femininas
+          "MLB1294":    "MLB-WOMEN-CLOTHES-SIZE-GRID-ID",  // Saias
+          "MLB1435":    "MLB-WOMEN-CLOTHES-SIZE-GRID-ID",  // Macacões
+          "MLB1182":    "MLB-WOMEN-CLOTHES-SIZE-GRID-ID",  // Conjuntos Femininos
+          "MLB1003":    "MLB-MEN-CLOTHES-SIZE-GRID-ID",    // Camisas Masculinas
+          "MLB1273":    "MLB-MEN-CLOTHES-SIZE-GRID-ID",    // Calças Masculinas
+        };
+
+        const catId = p.category_id || "MLB108704";
+        const sizeGridId = SIZE_GRID_MAP[catId] || "MLB-WOMEN-CLOTHES-SIZE-GRID-ID";
+
         add("BRAND",           p.marca);
         add("GENDER",          p.sexo);
         add("MODEL",           p.modelo);
         add("COLOR",           p.cor);
         add("SIZE",            p.tamanho);
+        add("SIZE_GRID_ID",    sizeGridId);   // ✅ Obrigatório para vestuário ML
         add("MAIN_MATERIAL",   p.material);
         add("LENGTH_TYPE",     p.comprimento);
         add("SLEEVE_TYPE",     p.manga);
