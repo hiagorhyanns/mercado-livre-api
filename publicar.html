@@ -188,9 +188,6 @@ function fmtPreco(inp) {
   inp.value = "R$ " + v;
 }
 
-function gerarTitulo(card) {
-  // auto-preenchimento desativado — usuário preenche o título manualmente
-}
 function updCount(inp) {
   const c = inp.closest(".tw")?.querySelector(".tc");
   if (c) c.textContent = inp.value.length + "/60";
@@ -422,103 +419,10 @@ function addForm() {
 
 addForm();
 
-/* ── MONTAR BODY DA ML ──────────────────────────────────────────── */
-function montarBody(card) {
-  const g = n => { const e = card.querySelector(`[name="${n}"]`); return e ? e.value.trim() : ""; };
-
-  // Preço: "R$ 1.111,11" → 1111.11
-  const precoRaw = g("preco").replace(/\D/g, "");
-  const preco = precoRaw ? parseInt(precoRaw, 10) / 100 : 0;
-
-  const qtd = parseInt(g("quantidade"), 10) || 10;
-
-  const pictures = ["img1","img2","img3","img4"]
-    .map(n => g(n))
-    .filter(u => u && u.startsWith("http"))
-    .map(u => ({ source: u }));
-
-  // Atributos
-  const attributes = [];
-  const addAttr = (id, val) => { if (val) attributes.push({ id, value_name: String(val) }); };
-
-  addAttr("BRAND",          g("marca"));
-  addAttr("GENDER",         g("sexo"));
-  addAttr("MODEL",          g("modelo"));
-  addAttr("COLOR",          g("cor"));
-  addAttr("SIZE",           g("tamanho"));
-  addAttr("MAIN_MATERIAL",  g("material"));
-  addAttr("LENGTH_TYPE",    g("comprimento"));
-  addAttr("SLEEVE_TYPE",    g("manga"));
-  addAttr("COLLAR_TYPE",    g("gola"));
-  addAttr("DRESS_TYPE",     g("tipo_vestido"));
-  addAttr("LAUNCH_SEASON",  g("temporada"));
-  addAttr("AGE_GROUP",      g("faixa_etaria"));
-  addAttr("IS_FOR_PREGNANT",g("gestante"));
-
-  const oc = getChips(card, "ocasioes");
-  if (oc.length) addAttr("OCCASION", oc.join(", "));
-  const es = getChips(card, "estilos");
-  if (es.length) addAttr("STYLE", es.join(", "));
-
-  const freteEl = card.querySelector('[name="frete_gratis"]');
-
-  // Shipping
-  const shipping = {
-    mode: "me2",
-    free_shipping: freteEl ? freteEl.checked : false
-  };
-
-  const peso    = parseFloat(g("peso_kg"));
-  const largura = parseFloat(g("largura_cm"));
-  const altura  = parseFloat(g("altura_cm"));
-  const prof    = parseFloat(g("profundidade_cm"));
-  if (peso && largura && altura && prof) {
-    shipping.dimensions = {
-      width:  { value: largura, unit: "cm" },
-      height: { value: altura,  unit: "cm" },
-      length: { value: prof,    unit: "cm" }
-    };
-  }
-
-  const titulo = g("titulo");
-
-  // ══════════════════════════════════════════════════════════════════
-  // BODY FINAL — estrutura correta para ML com variations obrigatório
-  // family_name → raiz
-  // price + available_quantity → dentro de cada variation
-  // ══════════════════════════════════════════════════════════════════
-  const body = {
-    title:            titulo,
-    category_id:      g("categoria"),
-    currency_id:      "BRL",
-    buying_mode:      "buy_it_now",
-    listing_type_id:  g("listing_type") || "gold_special",
-    condition:        g("condition")    || "new",
-    pictures,
-    shipping,
-    attributes,
-
-    // Obrigatório na raiz quando há variations
-    family_name: titulo,
-
-    // price e available_quantity DENTRO de variations
-    variations: [
-      {
-        attribute_combinations: [
-          { id: "COLOR", value_name: g("cor")     },
-          { id: "SIZE",  value_name: g("tamanho") }
-        ],
-        price:              preco,
-        available_quantity: qtd,
-        ...(g("sku") ? { seller_custom_field: g("sku") } : {})
-      }
-    ]
-  };
-
-  // Garantia só se preenchida
-  if (g("garantia")) body.warranty = g("garantia");
-
-  return { body, descricao: g("descricao"), titulo };
+/* ── UTILS ──────────────────────────────────────────────────────── */
+function getChips(card, name) {
+  const g = card.querySelector(`.chip-group[data-name="${name}"]`);
+  return g ? [...g.querySelectorAll(".chip.on")].map(c => c.dataset.value) : [];
 }
 
 /* ── VALIDAR CARD ────────────────────────────────────────────────── */
@@ -538,7 +442,7 @@ function validar(card) {
   return null;
 }
 
-/* ── PUBLICAR — chama ML direto do browser ──────────────────────── */
+/* ── PUBLICAR ────────────────────────────────────────────────────── */
 async function publicar() {
   const btn = document.getElementById("btnPub");
   btn.disabled = true;
@@ -596,7 +500,8 @@ async function publicar() {
   }
 
   try {
-    const res  = await fetch("/create-items", {
+    // ✅ CORREÇÃO: chamando /api/create-items (rota correta no Vercel)
+    const res = await fetch("/api/create-items", {
       method:  "POST",
       headers: { "Content-Type": "application/json" },
       body:    JSON.stringify({ produtos, token })
@@ -611,7 +516,7 @@ async function publicar() {
       btn.disabled=false; btn.innerHTML="Publicar tudo"; return;
     }
 
-    console.log("Resposta /create-items:", data);
+    console.log("Resposta /api/create-items:", data);
 
     if (!Array.isArray(data)) {
       showAlert("Erro no servidor: "+(data.error||JSON.stringify(data)),"er");
@@ -624,7 +529,7 @@ async function publicar() {
     else        showAlert(`⚠️ ${erros} erro(s) — veja detalhes acima`,"er");
 
   } catch(err) {
-    showAlert("Erro ao chamar /create-items: "+err.message,"er");
+    showAlert("Erro ao chamar /api/create-items: "+err.message,"er");
     console.error(err);
   }
 
