@@ -63,10 +63,10 @@ export default async function handler(req, res) {
           };
         }
 
-        // Body sem family_name e sem variations
-        // price e available_quantity na raiz
+        // ✅ CORREÇÃO: family_name obrigatório para categorias de vestuário
         const mlBody = {
           title:              p.title,
+          family_name:        p.title,   // ← obrigatório para MLB1430 e similares
           category_id:        p.category_id || "MLB1430",
           price:              Number(p.price),
           currency_id:        "BRL",
@@ -83,7 +83,7 @@ export default async function handler(req, res) {
 
         console.log("BODY:", JSON.stringify(mlBody));
 
-        const mlRes  = await fetch("https://api.mercadolibre.com/items", {
+        const mlRes = await fetch("https://api.mercadolibre.com/items", {
           method:  "POST",
           headers: {
             "Authorization": `Bearer ${tk}`,
