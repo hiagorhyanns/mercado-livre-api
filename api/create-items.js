@@ -70,9 +70,10 @@ export default async function handler(req, res) {
         // ✅ Para categorias de vestuário:
         // - NÃO enviar "title" na raiz, usar "family_name"
         // - MLB1430 é pai — usar MLB1269551 (Vestidos Femininos) como leaf
+        // Teste1 (invertado pelo claude) - MLB1269551
         const mlBody = {
           family_name:        p.title,
-          category_id:        p.category_id || "MLB1269551",
+          category_id:        p.category_id || "MLB108704",
           price:              Number(p.price),
           currency_id:        "BRL",
           available_quantity: Number(p.quantidade) > 0 ? Number(p.quantidade) : 10,
