@@ -71,6 +71,7 @@ export default async function handler(req, res) {
         // - NÃO enviar "title" na raiz, usar "family_name"
         // - MLB1430 é pai — usar MLB1269551 (Vestidos Femininos) como leaf
         // Teste1 (invertado pelo claude) - MLB1269551
+        
         const mlBody = {
           family_name:        p.title,
           category_id:        p.category_id || "MLB108704",
