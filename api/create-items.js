@@ -25,6 +25,35 @@ export default async function handler(req, res) {
     const tk = String(token).trim();
     const results = [];
 
+    // Busca o SIZE_GRID_ID real do ML uma vez por requisição (ID numérico, não string fixa)
+    let sizeGridFeminino = null;
+    let sizeGridMasculino = null;
+    try {
+      const gridRes = await fetch("https://api.mercadolibre.com/catalog/charts/domains/search", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${tk}`,
+          "Content-Type":  "application/json"
+        },
+        body: JSON.stringify({ site_id: "MLB", type: "STANDARD" })
+      });
+      const gridData = await gridRes.json();
+      const charts = Array.isArray(gridData) ? gridData : (gridData.results || []);
+
+      for (const c of charts) {
+        const genderAttr = (c.attributes || []).find(a => a.id === "GENDER");
+        if (!genderAttr) continue;
+        const vals = (genderAttr.values || []).map(v => (v.name || "").toLowerCase());
+        if (vals.some(v => v.includes("feminin")) && !sizeGridFeminino)  sizeGridFeminino  = String(c.id);
+        if (vals.some(v => v.includes("masculin")) && !sizeGridMasculino) sizeGridMasculino = String(c.id);
+      }
+      console.log("SIZE_GRID feminino:", sizeGridFeminino, "masculino:", sizeGridMasculino);
+    } catch(e) {
+      console.log("Aviso: falha ao buscar SIZE_GRID:", e.message);
+    }
+
+    const CAT_MASC = new Set(["MLB1003", "MLB1273", "MLB1004", "MLB1280"]);
+
     for (const p of produtos) {
       if (!p.title || !p.price || !p.pictures?.length || !p.cor || !p.tamanho || !p.sexo || !p.marca) {
         results.push({ erro: true, titulo: p.title || "Sem titulo", detalhe: { message: "Campos obrigatorios ausentes", cause: [] } });
@@ -39,27 +68,11 @@ export default async function handler(req, res) {
         const attributes = [];
         const add = (id, val) => { if (val) attributes.push({ id, value_name: String(val) }); };
 
-        // Mapa de categoria → grade de tamanhos do ML (SIZE_GRID_ID)
-        const SIZE_GRID_MAP = {
-          "MLB108704":  "MLB-WOMEN-CLOTHES-SIZE-GRID-ID",  // Vestidos Femininos
-          "MLB1271102": "MLB-WOMEN-CLOTHES-SIZE-GRID-ID",  // Blusas Femininas
-          "MLB1292":    "MLB-WOMEN-CLOTHES-SIZE-GRID-ID",  // Calças Femininas
-          "MLB1294":    "MLB-WOMEN-CLOTHES-SIZE-GRID-ID",  // Saias
-          "MLB1435":    "MLB-WOMEN-CLOTHES-SIZE-GRID-ID",  // Macacões
-          "MLB1182":    "MLB-WOMEN-CLOTHES-SIZE-GRID-ID",  // Conjuntos Femininos
-          "MLB1003":    "MLB-MEN-CLOTHES-SIZE-GRID-ID",    // Camisas Masculinas
-          "MLB1273":    "MLB-MEN-CLOTHES-SIZE-GRID-ID",    // Calças Masculinas
-        };
-
-        const catId = p.category_id || "MLB108704";
-        const sizeGridId = SIZE_GRID_MAP[catId] || "MLB-WOMEN-CLOTHES-SIZE-GRID-ID";
-
         add("BRAND",           p.marca);
         add("GENDER",          p.sexo);
         add("MODEL",           p.modelo);
         add("COLOR",           p.cor);
         add("SIZE",            p.tamanho);
-        add("SIZE_GRID_ID",    sizeGridId);   // ✅ Obrigatório para vestuário ML
         add("MAIN_MATERIAL",   p.material);
         add("LENGTH_TYPE",     p.comprimento);
         add("SLEEVE_TYPE",     p.manga);
@@ -71,7 +84,13 @@ export default async function handler(req, res) {
         add("OCCASION",        p.ocasioes);
         add("STYLE",           p.estilos);
 
-        // Shipping: só adiciona dimensions se valores forem válidos (mín 20cm cada)
+        // SIZE_GRID_ID: só adiciona se o ML retornou um ID real (número), nunca string fixa
+        const catId = p.category_id || "MLB108704";
+        const ehMasc = CAT_MASC.has(catId) || (p.sexo || "").toLowerCase().includes("masculin");
+        const gridId = ehMasc ? sizeGridMasculino : sizeGridFeminino;
+        if (gridId) add("SIZE_GRID_ID", gridId);
+
+        // Shipping
         const shipping = { mode: "me2", free_shipping: p.frete_gratis === true };
         const dimW = Number(p.largura_cm);
         const dimH = Number(p.altura_cm);
@@ -84,14 +103,9 @@ export default async function handler(req, res) {
           };
         }
 
-        // ✅ Para categorias de vestuário:
-        // - NÃO enviar "title" na raiz, usar "family_name"
-        // - MLB1430 é pai — usar MLB1269551 (Vestidos Femininos) como leaf
-        // Teste1 (invertado pelo claude) - MLB1269551
-        
         const mlBody = {
-          family_name:        p.title,
-          category_id:        p.category_id || "MLB108704",
+          title:              p.title,          // ✅ "title" correto — "family_name" é só para catálogo
+          category_id:        catId,
           price:              Number(p.price),
           currency_id:        "BRL",
           available_quantity: Number(p.quantidade) > 0 ? Number(p.quantidade) : 10,
@@ -101,8 +115,8 @@ export default async function handler(req, res) {
           pictures,
           shipping,
           attributes,
-          ...(p.garantia ? { warranty: p.garantia }              : {}),
-          ...(p.sku      ? { seller_custom_field: String(p.sku) } : {})
+          ...(p.garantia ? { warranty: p.garantia }               : {}),
+          ...(p.sku      ? { seller_custom_field: String(p.sku) }  : {})
         };
 
         console.log("BODY:", JSON.stringify(mlBody));
