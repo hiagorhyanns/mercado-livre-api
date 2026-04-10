@@ -104,8 +104,7 @@ export default async function handler(req, res) {
         }
 
         const mlBody = {
-          title:              p.title,
-          family_name:        p.title,          // ✅ Categorias de catálogo (vestuário) exigem family_name
+          family_name:        p.title,          // ✅ Categorias ML de vestuário só aceitam family_name, NUNCA title
           category_id:        catId,
           price:              Number(p.price),
           currency_id:        "BRL",
