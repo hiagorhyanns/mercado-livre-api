@@ -24,54 +24,62 @@ export default async function handler(req, res) {
 
     const tk = String(token).trim();
     const results = [];
+    const gridCache = {};
 
-    // ── Buscar SIZE_GRID_ID padrão do ML ──────────────────────────────────
-    let sizeGridFeminino  = null;
-    let sizeGridMasculino = null;
+    async function buscarSizeGridId(catId, genero) {
+      const key = catId + genero;
+      if (gridCache[key] !== undefined) return gridCache[key];
 
-    async function buscarGrid(genero) {
-      // Endpoint 1: /catalog/charts/search
+      let gridId = null;
       try {
-        const r = await fetch("https://api.mercadolibre.com/catalog/charts/search", {
-          method: "POST",
-          headers: { "Authorization": `Bearer ${tk}`, "Content-Type": "application/json" },
-          body: JSON.stringify({
-            site_id: "MLB",
-            type: "STANDARD",
-            attributes: [{ id: "GENDER", values: [{ name: genero }] }]
-          })
+        // Passo 1: pegar domain_id da categoria
+        const catRes  = await fetch(`https://api.mercadolibre.com/categories/${catId}`, {
+          headers: { "Authorization": `Bearer ${tk}` }
         });
-        const d = await r.json();
-        console.log(`[grid][${genero}] /charts/search status=${r.status} body=`, JSON.stringify(d).substring(0, 400));
-        const list = Array.isArray(d) ? d : (d.results || d.charts || []);
-        if (list.length > 0 && list[0].id) return String(list[0].id);
-      } catch(e) { console.log(`[grid][${genero}] /charts/search erro:`, e.message); }
+        const catData  = await catRes.json();
+        const domainId = catData?.domain_id;
+        console.log(`[grid] cat=${catId} domain=${domainId}`);
 
-      // Endpoint 2: /catalog/charts/domains/search
-      try {
-        const r = await fetch("https://api.mercadolibre.com/catalog/charts/domains/search", {
-          method: "POST",
-          headers: { "Authorization": `Bearer ${tk}`, "Content-Type": "application/json" },
-          body: JSON.stringify({ site_id: "MLB", type: "STANDARD" })
-        });
-        const d = await r.json();
-        console.log(`[grid][${genero}] /domains/search status=${r.status} body=`, JSON.stringify(d).substring(0, 600));
-        const list = Array.isArray(d) ? d : (d.results || d.charts || []);
-        for (const c of list) {
-          const ga = (c.attributes || []).find(a => a.id === "GENDER");
-          if (!ga) continue;
-          const vals = (ga.values || []).map(v => (v.name || "").toLowerCase());
-          if (vals.some(v => v.includes(genero.toLowerCase().substring(0, 5)))) return String(c.id);
+        // Passo 2: buscar chart STANDARD com domain + gênero
+        if (domainId) {
+          const r1 = await fetch("https://api.mercadolibre.com/catalog/charts/search", {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${tk}`, "Content-Type": "application/json" },
+            body: JSON.stringify({
+              site_id: "MLB", type: "STANDARD", domain_id: domainId,
+              attributes: [{ id: "GENDER", values: [{ name: genero }] }]
+            })
+          });
+          const d1 = await r1.json();
+          console.log(`[grid] domain+gender status=${r1.status}`, JSON.stringify(d1).substring(0, 500));
+          const l1 = Array.isArray(d1) ? d1 : (d1.results || d1.charts || []);
+          if (l1.length && l1[0].id) gridId = String(l1[0].id);
         }
-      } catch(e) { console.log(`[grid][${genero}] /domains/search erro:`, e.message); }
 
-      return null;
+        // Passo 3: fallback sem domain
+        if (!gridId) {
+          const r2 = await fetch("https://api.mercadolibre.com/catalog/charts/search", {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${tk}`, "Content-Type": "application/json" },
+            body: JSON.stringify({
+              site_id: "MLB", type: "STANDARD",
+              attributes: [{ id: "GENDER", values: [{ name: genero }] }]
+            })
+          });
+          const d2 = await r2.json();
+          console.log(`[grid] sem-domain status=${r2.status}`, JSON.stringify(d2).substring(0, 500));
+          const l2 = Array.isArray(d2) ? d2 : (d2.results || d2.charts || []);
+          if (l2.length && l2[0].id) gridId = String(l2[0].id);
+        }
+
+      } catch(e) {
+        console.log(`[grid] erro:`, e.message);
+      }
+
+      console.log(`[grid] FINAL cat=${catId} genero=${genero} gridId=${gridId}`);
+      gridCache[key] = gridId;
+      return gridId;
     }
-
-    sizeGridFeminino  = await buscarGrid("Feminino");
-    sizeGridMasculino = await buscarGrid("Masculino");
-    console.log("[grid] FINAL feminino:", sizeGridFeminino, "masculino:", sizeGridMasculino);
-    // ─────────────────────────────────────────────────────────────────────
 
     const CAT_MASC = new Set(["MLB1003", "MLB1273", "MLB1004", "MLB1280"]);
 
@@ -85,6 +93,10 @@ export default async function handler(req, res) {
         const pictures = p.pictures
           .filter(u => typeof u === "string" && u.startsWith("http"))
           .map(u => ({ source: u }));
+
+        const catId  = p.category_id || "MLB108704";
+        const ehMasc = CAT_MASC.has(catId) || (p.sexo || "").toLowerCase().includes("masculin");
+        const genero = ehMasc ? "Masculino" : "Feminino";
 
         const attributes = [];
         const add = (id, val) => { if (val) attributes.push({ id, value_name: String(val) }); };
@@ -105,13 +117,9 @@ export default async function handler(req, res) {
         add("OCCASION",        p.ocasioes);
         add("STYLE",           p.estilos);
 
-        // SIZE_GRID_ID — só inclui se encontrou ID real via API
-        const catId  = p.category_id || "MLB108704";
-        const ehMasc = CAT_MASC.has(catId) || (p.sexo || "").toLowerCase().includes("masculin");
-        const gridId = ehMasc ? sizeGridMasculino : sizeGridFeminino;
+        const gridId = await buscarSizeGridId(catId, genero);
         if (gridId) add("SIZE_GRID_ID", gridId);
 
-        // Shipping
         const shipping = { mode: "me2", free_shipping: p.frete_gratis === true };
         const dimW = Number(p.largura_cm);
         const dimH = Number(p.altura_cm);
@@ -124,7 +132,6 @@ export default async function handler(req, res) {
           };
         }
 
-        // ⚠️ Para categorias de catálogo ML (vestuário), usa family_name — NÃO title
         const mlBody = {
           family_name:        p.title,
           category_id:        catId,
