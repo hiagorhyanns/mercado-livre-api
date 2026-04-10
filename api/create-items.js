@@ -25,32 +25,52 @@ export default async function handler(req, res) {
     const tk = String(token).trim();
     const results = [];
 
-    // Busca o SIZE_GRID_ID real do ML uma vez por requisição (ID numérico, não string fixa)
+    // Busca SIZE_GRID_ID padrão do ML tentando múltiplos endpoints
     let sizeGridFeminino = null;
     let sizeGridMasculino = null;
-    try {
-      const gridRes = await fetch("https://api.mercadolibre.com/catalog/charts/domains/search", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${tk}`,
-          "Content-Type":  "application/json"
-        },
-        body: JSON.stringify({ site_id: "MLB", type: "STANDARD" })
-      });
-      const gridData = await gridRes.json();
-      const charts = Array.isArray(gridData) ? gridData : (gridData.results || []);
 
-      for (const c of charts) {
-        const genderAttr = (c.attributes || []).find(a => a.id === "GENDER");
-        if (!genderAttr) continue;
-        const vals = (genderAttr.values || []).map(v => (v.name || "").toLowerCase());
-        if (vals.some(v => v.includes("feminin")) && !sizeGridFeminino)  sizeGridFeminino  = String(c.id);
-        if (vals.some(v => v.includes("masculin")) && !sizeGridMasculino) sizeGridMasculino = String(c.id);
-      }
-      console.log("SIZE_GRID feminino:", sizeGridFeminino, "masculino:", sizeGridMasculino);
-    } catch(e) {
-      console.log("Aviso: falha ao buscar SIZE_GRID:", e.message);
+    async function buscarGridPorGenero(genero) {
+      // Tentativa 1: POST /catalog/charts/search com filtro de gênero e categoria
+      try {
+        const r1 = await fetch("https://api.mercadolibre.com/catalog/charts/search", {
+          method: "POST",
+          headers: { "Authorization": `Bearer ${tk}`, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            site_id: "MLB",
+            type: "STANDARD",
+            attributes: [{ id: "GENDER", values: [{ name: genero }] }]
+          })
+        });
+        const d1 = await r1.json();
+        console.log(`Grid search [${genero}] T1 status:`, r1.status, "body:", JSON.stringify(d1).substring(0, 300));
+        const list1 = Array.isArray(d1) ? d1 : (d1.results || d1.charts || []);
+        if (list1.length > 0 && list1[0].id) return String(list1[0].id);
+      } catch(e) { console.log("T1 erro:", e.message); }
+
+      // Tentativa 2: POST /catalog/charts/domains/search
+      try {
+        const r2 = await fetch("https://api.mercadolibre.com/catalog/charts/domains/search", {
+          method: "POST",
+          headers: { "Authorization": `Bearer ${tk}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ site_id: "MLB", type: "STANDARD" })
+        });
+        const d2 = await r2.json();
+        console.log(`Grid domains [${genero}] T2 status:`, r2.status, "body:", JSON.stringify(d2).substring(0, 500));
+        const list2 = Array.isArray(d2) ? d2 : (d2.results || d2.charts || []);
+        for (const c of list2) {
+          const gAttr = (c.attributes || []).find(a => a.id === "GENDER");
+          if (!gAttr) continue;
+          const vals = (gAttr.values || []).map(v => (v.name || "").toLowerCase());
+          if (vals.some(v => v.includes(genero.toLowerCase().substring(0, 5)))) return String(c.id);
+        }
+      } catch(e) { console.log("T2 erro:", e.message); }
+
+      return null;
     }
+
+    sizeGridFeminino  = await buscarGridPorGenero("Feminino");
+    sizeGridMasculino = await buscarGridPorGenero("Masculino");
+    console.log("SIZE_GRID FINAL — feminino:", sizeGridFeminino, "masculino:", sizeGridMasculino);
 
     const CAT_MASC = new Set(["MLB1003", "MLB1273", "MLB1004", "MLB1280"]);
 
@@ -104,7 +124,7 @@ export default async function handler(req, res) {
         }
 
         const mlBody = {
-          family_name:        p.title,          // ✅ Categorias ML de vestuário só aceitam family_name, NUNCA title
+          title:              p.title,          // ✅ "title" correto — "family_name" é só para catálogo
           category_id:        catId,
           price:              Number(p.price),
           currency_id:        "BRL",
