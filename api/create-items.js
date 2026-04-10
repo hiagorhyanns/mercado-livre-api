@@ -25,14 +25,14 @@ export default async function handler(req, res) {
     const tk = String(token).trim();
     const results = [];
 
-    // Busca SIZE_GRID_ID padrão do ML tentando múltiplos endpoints
-    let sizeGridFeminino = null;
+    // ── Buscar SIZE_GRID_ID padrão do ML ──────────────────────────────────
+    let sizeGridFeminino  = null;
     let sizeGridMasculino = null;
 
-    async function buscarGridPorGenero(genero) {
-      // Tentativa 1: POST /catalog/charts/search com filtro de gênero e categoria
+    async function buscarGrid(genero) {
+      // Endpoint 1: /catalog/charts/search
       try {
-        const r1 = await fetch("https://api.mercadolibre.com/catalog/charts/search", {
+        const r = await fetch("https://api.mercadolibre.com/catalog/charts/search", {
           method: "POST",
           headers: { "Authorization": `Bearer ${tk}`, "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -41,36 +41,37 @@ export default async function handler(req, res) {
             attributes: [{ id: "GENDER", values: [{ name: genero }] }]
           })
         });
-        const d1 = await r1.json();
-        console.log(`Grid search [${genero}] T1 status:`, r1.status, "body:", JSON.stringify(d1).substring(0, 300));
-        const list1 = Array.isArray(d1) ? d1 : (d1.results || d1.charts || []);
-        if (list1.length > 0 && list1[0].id) return String(list1[0].id);
-      } catch(e) { console.log("T1 erro:", e.message); }
+        const d = await r.json();
+        console.log(`[grid][${genero}] /charts/search status=${r.status} body=`, JSON.stringify(d).substring(0, 400));
+        const list = Array.isArray(d) ? d : (d.results || d.charts || []);
+        if (list.length > 0 && list[0].id) return String(list[0].id);
+      } catch(e) { console.log(`[grid][${genero}] /charts/search erro:`, e.message); }
 
-      // Tentativa 2: POST /catalog/charts/domains/search
+      // Endpoint 2: /catalog/charts/domains/search
       try {
-        const r2 = await fetch("https://api.mercadolibre.com/catalog/charts/domains/search", {
+        const r = await fetch("https://api.mercadolibre.com/catalog/charts/domains/search", {
           method: "POST",
           headers: { "Authorization": `Bearer ${tk}`, "Content-Type": "application/json" },
           body: JSON.stringify({ site_id: "MLB", type: "STANDARD" })
         });
-        const d2 = await r2.json();
-        console.log(`Grid domains [${genero}] T2 status:`, r2.status, "body:", JSON.stringify(d2).substring(0, 500));
-        const list2 = Array.isArray(d2) ? d2 : (d2.results || d2.charts || []);
-        for (const c of list2) {
-          const gAttr = (c.attributes || []).find(a => a.id === "GENDER");
-          if (!gAttr) continue;
-          const vals = (gAttr.values || []).map(v => (v.name || "").toLowerCase());
+        const d = await r.json();
+        console.log(`[grid][${genero}] /domains/search status=${r.status} body=`, JSON.stringify(d).substring(0, 600));
+        const list = Array.isArray(d) ? d : (d.results || d.charts || []);
+        for (const c of list) {
+          const ga = (c.attributes || []).find(a => a.id === "GENDER");
+          if (!ga) continue;
+          const vals = (ga.values || []).map(v => (v.name || "").toLowerCase());
           if (vals.some(v => v.includes(genero.toLowerCase().substring(0, 5)))) return String(c.id);
         }
-      } catch(e) { console.log("T2 erro:", e.message); }
+      } catch(e) { console.log(`[grid][${genero}] /domains/search erro:`, e.message); }
 
       return null;
     }
 
-    sizeGridFeminino  = await buscarGridPorGenero("Feminino");
-    sizeGridMasculino = await buscarGridPorGenero("Masculino");
-    console.log("SIZE_GRID FINAL — feminino:", sizeGridFeminino, "masculino:", sizeGridMasculino);
+    sizeGridFeminino  = await buscarGrid("Feminino");
+    sizeGridMasculino = await buscarGrid("Masculino");
+    console.log("[grid] FINAL feminino:", sizeGridFeminino, "masculino:", sizeGridMasculino);
+    // ─────────────────────────────────────────────────────────────────────
 
     const CAT_MASC = new Set(["MLB1003", "MLB1273", "MLB1004", "MLB1280"]);
 
@@ -104,8 +105,8 @@ export default async function handler(req, res) {
         add("OCCASION",        p.ocasioes);
         add("STYLE",           p.estilos);
 
-        // SIZE_GRID_ID: só adiciona se o ML retornou um ID real (número), nunca string fixa
-        const catId = p.category_id || "MLB108704";
+        // SIZE_GRID_ID — só inclui se encontrou ID real via API
+        const catId  = p.category_id || "MLB108704";
         const ehMasc = CAT_MASC.has(catId) || (p.sexo || "").toLowerCase().includes("masculin");
         const gridId = ehMasc ? sizeGridMasculino : sizeGridFeminino;
         if (gridId) add("SIZE_GRID_ID", gridId);
@@ -123,8 +124,9 @@ export default async function handler(req, res) {
           };
         }
 
+        // ⚠️ Para categorias de catálogo ML (vestuário), usa family_name — NÃO title
         const mlBody = {
-          title:              p.title,          // ✅ "title" correto — "family_name" é só para catálogo
+          family_name:        p.title,
           category_id:        catId,
           price:              Number(p.price),
           currency_id:        "BRL",
@@ -139,7 +141,7 @@ export default async function handler(req, res) {
           ...(p.sku      ? { seller_custom_field: String(p.sku) }  : {})
         };
 
-        console.log("BODY:", JSON.stringify(mlBody));
+        console.log("[item] BODY:", JSON.stringify(mlBody));
 
         const mlRes = await fetch("https://api.mercadolibre.com/items", {
           method:  "POST",
@@ -152,7 +154,7 @@ export default async function handler(req, res) {
         });
 
         const mlText = await mlRes.text();
-        console.log("STATUS:", mlRes.status, "RESP:", mlText);
+        console.log("[item] STATUS:", mlRes.status, "RESP:", mlText);
 
         let mlData = {};
         try { mlData = JSON.parse(mlText); } catch(e) {
