@@ -24,63 +24,154 @@ export default async function handler(req, res) {
 
     const tk = String(token).trim();
     const results = [];
+
+    // Cache de { gridId, rows: [{size, rowId}] } por chave "domainId|generoId"
     const chartCache = {};
-    const debugLog = []; // visível na resposta do browser
 
-    const TAMANHOS = ["PP","P","M","G","GG","XGG","34","36","38","40","42","44","46","48","Único"];
+    // Gêneros reconhecidos pelo ML Brasil
+    // GET /catalog_domains/MLB-DRESSES/attributes/GENDER para ver os valores
+    const GENDER_MAP = {
+      feminino: { value_id: "339665", value_name: "Mulher"  },
+      masculino: { value_id: "339666", value_name: "Homem"   },
+    };
 
-    async function obterOuCriarChart(domainId, genero) {
-      const key = `${domainId}|${genero}`;
-      if (chartCache[key]) return chartCache[key];
+    // Tamanhos padrão — serão filtrados pela ficha técnica do domínio
+    const TAMANHOS_BASE = [
+      "3XS","2XS","XS","PP","P","M","G","GG","XG","XGG","2XG","3XG",
+      "34","36","38","40","42","44","46","48","50","52","54",
+      "Único","U"
+    ];
 
-      // 1. Buscar chart existente
+    async function criarOuBuscarChart(domainIdFull, generoKey) {
+      // domainIdFull ex: "MLB-DRESSES"
+      // Para as chamadas de chart: sem prefixo do site → "DRESSES"
+      const domainSemSite = domainIdFull.replace(/^[A-Z]+-/, "");
+      const cacheKey = `${domainSemSite}|${generoKey}`;
+
+      if (chartCache[cacheKey]) return chartCache[cacheKey];
+
+      const genderInfo = GENDER_MAP[generoKey] || GENDER_MAP.feminino;
+
+      // ── 1. Buscar chart existente do vendedor ─────────────────────────────
       try {
-        const r = await fetch("https://api.mercadolibre.com/catalog/charts/search", {
+        const sr = await fetch("https://api.mercadolibre.com/catalog/charts/search", {
           method: "POST",
           headers: { "Authorization": `Bearer ${tk}`, "Content-Type": "application/json" },
           body: JSON.stringify({
-            site_id:    "MLB",
-            domain_id:  domainId,
-            attributes: [{ id: "GENDER", values: [{ name: genero }] }]
+            site_id:   "MLB",
+            type:      "SPECIFIC",
+            domain_id: domainSemSite,
+            attributes: [{ id: "GENDER", value_id: genderInfo.value_id }]
           })
         });
-        const d = await r.json();
-        debugLog.push({ step: "chart_search", status: r.status, domain: domainId, genero, resp: d });
-        const list = Array.isArray(d) ? d : (d.results || d.charts || []);
+        const sd = await sr.json();
+        console.log(`[chart][search] domain=${domainSemSite} status=${sr.status}`, JSON.stringify(sd).substring(0, 400));
+        const list = Array.isArray(sd) ? sd : (sd.results || sd.charts || []);
         if (list.length && list[0].id) {
-          chartCache[key] = String(list[0].id);
-          return chartCache[key];
+          // Buscar rows desse chart existente
+          const existingId = String(list[0].id);
+          const rows = await buscarRows(existingId);
+          chartCache[cacheKey] = { gridId: existingId, rows };
+          return chartCache[cacheKey];
         }
       } catch(e) {
-        debugLog.push({ step: "chart_search_error", domain: domainId, genero, err: e.message });
+        console.log(`[chart][search] erro:`, e.message);
       }
 
-      // 2. Criar nova tabela
+      // ── 2. Buscar ficha técnica do domínio para saber o formato ───────────
+      let specRows = null;
       try {
+        const specRes = await fetch(
+          `https://api.mercadolibre.com/domains/${domainIdFull}/technical_specs?section=grids`,
+          { headers: { "Authorization": `Bearer ${tk}` } }
+        );
+        const specData = await specRes.json();
+        console.log(`[spec] domain=${domainIdFull} status=${specRes.status}`, JSON.stringify(specData).substring(0, 600));
+        // Extrair atributos de row que o domínio aceita
+        specRows = specData;
+      } catch(e) {
+        console.log(`[spec] erro:`, e.message);
+      }
+
+      // ── 3. Criar chart SPECIFIC ───────────────────────────────────────────
+      try {
+        // Montar rows com tamanhos padrão — formato mínimo aceito
+        const rowsBody = TAMANHOS_BASE.map(t => ({
+          attributes: [
+            { id: "SIZE",       value_name: t },
+            { id: "GENDER",     value_id: genderInfo.value_id, value_name: genderInfo.value_name }
+          ]
+        }));
+
         const chartBody = {
-          names:       { MLB: `Guia de Tamanhos ${genero}` },
-          domain_id:   domainId,
-          site_id:     "MLB",
-          attributes:  [{ id: "GENDER", values: [{ name: genero }] }],
-          main_attribute: { attributes: [{ site_id: "MLB", id: "SIZE" }] },
-          rows: TAMANHOS.map(t => ({ attributes: [{ id: "SIZE", values: [{ name: t }] }] }))
+          type:      "SPECIFIC",
+          site_id:   "MLB",
+          domain_id: domainSemSite,
+          names:     { MLB: `Guia de Tamanhos ${genderInfo.value_name}` },
+          main_attribute: {
+            attributes: [{ site_id: "MLB", id: "SIZE" }]
+          },
+          attributes: [
+            { id: "GENDER", value_id: genderInfo.value_id, value_name: genderInfo.value_name }
+          ],
+          rows: rowsBody
         };
+
         const cr = await fetch("https://api.mercadolibre.com/catalog/charts", {
           method:  "POST",
           headers: { "Authorization": `Bearer ${tk}`, "Content-Type": "application/json" },
           body:    JSON.stringify(chartBody)
         });
         const cd = await cr.json();
-        debugLog.push({ step: "chart_create", status: cr.status, domain: domainId, genero, resp: cd });
+        console.log(`[chart][create] domain=${domainSemSite} status=${cr.status}`, JSON.stringify(cd).substring(0, 600));
+
         if (cd.id) {
-          chartCache[key] = String(cd.id);
-          return chartCache[key];
+          const rows = await buscarRows(String(cd.id));
+          chartCache[cacheKey] = { gridId: String(cd.id), rows };
+          return chartCache[cacheKey];
         }
       } catch(e) {
-        debugLog.push({ step: "chart_create_error", domain: domainId, genero, err: e.message });
+        console.log(`[chart][create] erro:`, e.message);
       }
 
       return null;
+    }
+
+    // Busca as rows de um chart e retorna [{size, rowId}]
+    async function buscarRows(chartId) {
+      try {
+        const rr = await fetch(`https://api.mercadolibre.com/catalog/charts/${chartId}`, {
+          headers: { "Authorization": `Bearer ${tk}` }
+        });
+        const rd = await rr.json();
+        console.log(`[chart][rows] id=${chartId} status=${rr.status}`, JSON.stringify(rd).substring(0, 400));
+        const rows = rd.rows || [];
+        return rows.map(row => {
+          const sizeAttr = (row.local_attributes || row.attributes || [])
+            .find(a => a.id === "SIZE");
+          return {
+            size:  sizeAttr?.value_name || "",
+            rowId: String(row.id)
+          };
+        });
+      } catch(e) {
+        console.log(`[chart][rows] erro:`, e.message);
+        return [];
+      }
+    }
+
+    // Encontra o rowId mais próximo do tamanho do produto
+    function encontrarRowId(rows, tamanho) {
+      if (!rows || !rows.length) return null;
+      const t = String(tamanho).trim().toUpperCase();
+      // Busca exata
+      let match = rows.find(r => r.size.toUpperCase() === t);
+      if (match) return match.rowId;
+      // Busca parcial
+      match = rows.find(r => r.size.toUpperCase().includes(t) || t.includes(r.size.toUpperCase()));
+      if (match) return match.rowId;
+      // Fallback: primeira row
+      return rows[0]?.rowId || null;
     }
 
     const CAT_MASC = new Set(["MLB1003", "MLB1273", "MLB1004", "MLB1280"]);
@@ -96,21 +187,21 @@ export default async function handler(req, res) {
           .filter(u => typeof u === "string" && u.startsWith("http"))
           .map(u => ({ source: u }));
 
-        const catId  = p.category_id || "MLB108704";
-        const ehMasc = CAT_MASC.has(catId) || (p.sexo || "").toLowerCase().includes("masculin");
-        const genero = ehMasc ? "Masculino" : "Feminino";
+        const catId   = p.category_id || "MLB108704";
+        const ehMasc  = CAT_MASC.has(catId) || (p.sexo || "").toLowerCase().includes("masculin");
+        const genKey  = ehMasc ? "masculino" : "feminino";
 
-        // Pegar domain_id da categoria
-        let domainId = null;
+        // Buscar domain_id da categoria
+        let domainIdFull = null;
         try {
           const catRes  = await fetch(`https://api.mercadolibre.com/categories/${catId}`, {
             headers: { "Authorization": `Bearer ${tk}` }
           });
           const catData = await catRes.json();
-          domainId = catData?.domain_id;
-          debugLog.push({ step: "category", catId, domainId });
+          domainIdFull  = catData?.domain_id; // ex: "MLB-DRESSES"
+          console.log(`[cat] ${catId} → ${domainIdFull}`);
         } catch(e) {
-          debugLog.push({ step: "category_error", catId, err: e.message });
+          console.log(`[cat] erro:`, e.message);
         }
 
         const attributes = [];
@@ -132,10 +223,15 @@ export default async function handler(req, res) {
         add("OCCASION",        p.ocasioes);
         add("STYLE",           p.estilos);
 
-        if (domainId) {
-          const gridId = await obterOuCriarChart(domainId, genero);
-          debugLog.push({ step: "grid_result", domainId, genero, gridId });
-          if (gridId) add("SIZE_GRID_ID", gridId);
+        // Buscar/criar chart e adicionar SIZE_GRID_ID + SIZE_GRID_ROW_ID
+        if (domainIdFull) {
+          const chart = await criarOuBuscarChart(domainIdFull, genKey);
+          if (chart?.gridId) {
+            add("SIZE_GRID_ID", chart.gridId);
+            const rowId = encontrarRowId(chart.rows, p.tamanho);
+            if (rowId) add("SIZE_GRID_ROW_ID", rowId);
+            console.log(`[item] SIZE_GRID_ID=${chart.gridId} SIZE_GRID_ROW_ID=${rowId}`);
+          }
         }
 
         const shipping = { mode: "me2", free_shipping: p.frete_gratis === true };
@@ -166,6 +262,8 @@ export default async function handler(req, res) {
           ...(p.sku      ? { seller_custom_field: String(p.sku) }  : {})
         };
 
+        console.log("[item] BODY:", JSON.stringify(mlBody));
+
         const mlRes = await fetch("https://api.mercadolibre.com/items", {
           method:  "POST",
           headers: {
@@ -177,6 +275,8 @@ export default async function handler(req, res) {
         });
 
         const mlText = await mlRes.text();
+        console.log("[item] STATUS:", mlRes.status, "RESP:", mlText);
+
         let mlData = {};
         try { mlData = JSON.parse(mlText); } catch(e) {
           mlData = { message: "Resposta nao-JSON: " + mlText, cause: [] };
@@ -186,8 +286,7 @@ export default async function handler(req, res) {
           results.push({
             erro:    true,
             titulo:  p.title,
-            detalhe: { http_status: mlRes.status, ...mlData, cause: mlData.cause || [] },
-            _debug:  debugLog   // ← visível no console do browser
+            detalhe: { http_status: mlRes.status, ...mlData, cause: mlData.cause || [] }
           });
           continue;
         }
@@ -203,7 +302,7 @@ export default async function handler(req, res) {
         results.push({ sucesso: true, titulo: p.title, id: mlData.id, link: mlData.permalink });
 
       } catch (err) {
-        results.push({ erro: true, titulo: p.title, detalhe: { message: err.toString(), cause: [] }, _debug: debugLog });
+        results.push({ erro: true, titulo: p.title, detalhe: { message: err.toString(), cause: [] } });
       }
     }
 
